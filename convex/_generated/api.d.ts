@@ -8,6 +8,13 @@
  * @module
  */
 
+import type * as actions_retrieveRelevantChunks from "../actions/retrieveRelevantChunks.js";
+import type * as actions_scrapeSource from "../actions/scrapeSource.js";
+import type * as mutations from "../mutations.js";
+import type * as testData from "../testData.js";
+import type * as utils_chunking from "../utils/chunking.js";
+import type * as utils_similarity from "../utils/similarity.js";
+
 import type {
   ApiFromModules,
   FilterApi,
@@ -22,7 +29,14 @@ import type {
  * const myFunctionReference = api.myModule.myFunction;
  * ```
  */
-declare const fullApi: ApiFromModules<{}>;
+declare const fullApi: ApiFromModules<{
+  "actions/retrieveRelevantChunks": typeof actions_retrieveRelevantChunks;
+  "actions/scrapeSource": typeof actions_scrapeSource;
+  mutations: typeof mutations;
+  testData: typeof testData;
+  "utils/chunking": typeof utils_chunking;
+  "utils/similarity": typeof utils_similarity;
+}>;
 declare const fullApiWithMounts: typeof fullApi;
 
 export declare const api: FilterApi<

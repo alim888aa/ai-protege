@@ -10,10 +10,10 @@
   },
   "dependencies": {
     "@clerk/nextjs": "^6.34.5",
-    "@mozilla/readability": "^0.6.0",
+    "@openrouter/ai-sdk-provider": "^1.2.3",
     "ai": "^5.0.90",
     "convex": "^1.28.2",
-    "jsdom": "^27.1.0",
+    "linkedom": "^0.18.12",
     "next": "16.0.1",
     "react": "19.2.0",
     "react-dom": "19.2.0",
@@ -21,6 +21,8 @@
     "zod": "^4.1.12"
   },
   "devDependencies": {
+    "@ai-sdk/huggingface": "^0.0.9",
+    "@ai-sdk/openai": "^2.0.65",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

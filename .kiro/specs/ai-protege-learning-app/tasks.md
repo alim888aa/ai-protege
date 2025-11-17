@@ -1,6 +1,11 @@
 # Implementation Plan
 
-- [ ] 1. Set up project structure and dependencies
+- [x] 1. Set up project structure and dependencies
+
+
+
+
+
 
 
 
@@ -11,7 +16,16 @@
   - Set up Convex project and link to Next.js app
   - _Requirements: 1.1, 2.1_
 
-- [ ] 2. Implement Convex schema and utility functions
+- [x] 2. Implement Convex schema and utility functions
+
+
+
+
+
+
+
+
+
   - Define sourceMaterial table schema in `convex/schema.ts` with sessionId, topic, sourceUrl, chunks array, and createdAt fields
   - Create text chunking utility function (1000 chars, 200 overlap) in `convex/utils/chunking.ts`
   - Create cosine similarity utility function in `convex/utils/similarity.ts`
@@ -22,7 +36,12 @@
   - Test cosine similarity calculation with known vector pairs
   - _Requirements: 7.2, 4.3_
 
-- [ ] 3. Implement web scraping and embedding generation
+- [x] 3. Implement web scraping and embedding generation
+
+
+
+
+
   - Create Convex action `scrapeSource` in `convex/actions/scrapeSource.ts` that fetches URL content
   - Integrate @mozilla/readability and jsdom to extract readable text content
   - Split content into chunks using chunking utility
@@ -32,7 +51,12 @@
   - Implement error handling for network failures, invalid HTML, and API failures
   - _Requirements: 1.2, 1.3, 1.4, 1.5, 7.1, 7.2, 7.3, 7.4, 7.5_
 
-- [ ] 4. Implement RAG retrieval action
+- [x] 4. Implement RAG retrieval action
+
+
+
+
+
   - Create Convex action `retrieveRelevantChunks` in `convex/actions/retrieveRelevantChunks.ts`
   - Generate embedding for user's text explanation using OpenAI embeddings API
   - Retrieve all chunks for the given sessionId from sourceMaterial table
@@ -40,7 +64,12 @@
   - Sort chunks by similarity in descending order and return top 5 using `.slice(0, 5)`
   - _Requirements: 4.1, 4.2, 4.3_
 
-- [ ] 5. Implement vision analysis server action
+- [x] 5. Implement vision analysis server action
+
+
+
+
+
   - Create Next.js server action `analyzeDrawing` in `app/actions/analyzeDrawing.ts`
   - Configure Hugging Face provider for Vercel AI SDK with Qwen 2VL model (qwen/qwen-2-vl-7b-instruct)
   - Define Zod schema for vision analysis output (conceptsDrawn, relationships, clarity, completeness, observations)
@@ -49,7 +78,12 @@
   - Return vision analysis object
   - _Requirements: 3.1, 3.2, 3.3_
 
-- [ ] 6. Implement evaluation synthesis server action
+- [x] 6. Implement evaluation synthesis server action
+
+
+
+
+
   - Create Next.js server action `evaluateTeaching` in `app/actions/evaluateTeaching.ts`
   - Define Zod schema for evaluation result (scores, feedback with clarifyingQuestions array, reasoning)
   - Implement prompt that synthesizes vision analysis and RAG chunks to evaluate teaching
@@ -59,7 +93,12 @@
   - Return evaluation object
   - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5, 6.1, 6.2, 6.3, 6.4_
 
-- [ ] 7. Build Setup Screen component
+- [x] 7. Build Setup Screen component
+
+
+
+
+
   - Create page component at `app/page.tsx` with form for topic and source URL
   - Implement form validation for URL format (HTTP/HTTPS only, no localhost/private IPs)
   - Add loading state UI during scraping and processing (5-15 seconds)
@@ -68,7 +107,12 @@
   - Navigate to `/teach/[sessionId]` on success, passing sessionId
   - _Requirements: 1.1, 1.2, 1.3, 1.6, 7.5_
 
-- [ ] 8. Build Teaching Screen component
+- [x] 8. Build Teaching Screen component
+
+
+
+
+
   - Create page component at `app/teach/[sessionId]/page.tsx` with split-panel layout
   - Integrate tldraw editor in left panel (60% width, 60% of panel height)
   - Add textarea for text explanation in left panel (40% of panel height)
@@ -77,7 +121,12 @@
   - Implement canvas export using Editor.toImage() method, convert blob to base64 using FileReader API
   - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6_
 
-- [ ] 9. Implement parallel evaluation orchestration
+- [x] 9. Implement parallel evaluation orchestration
+
+
+
+
+
   - In Teaching Screen submit handler, use Promise.all to run RAG retrieval and vision analysis in parallel
   - Call Convex action `retrieveRelevantChunks` with sessionId and text explanation
   - Call server action `analyzeDrawing` with canvas image base64 and topic
@@ -87,7 +136,12 @@
   - Handle errors and display user-friendly messages
   - _Requirements: 3.1, 3.4, 4.1, 4.5, 5.1, 6.5_
 
-- [ ] 10. Build Results Screen component
+- [x] 10. Build Results Screen component
+
+
+
+
+
   - Create page component at `app/results/page.tsx`
   - Parse evaluation data from URL search params (decode and JSON.parse)
   - Display large overall score (0-100) with visual indicator
