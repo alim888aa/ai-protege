@@ -13,6 +13,7 @@ import type * as actions_scrapeSource from "../actions/scrapeSource.js";
 import type * as mutations from "../mutations.js";
 import type * as testData from "../testData.js";
 import type * as utils_chunking from "../utils/chunking.js";
+import type * as utils_jargon from "../utils/jargon.js";
 import type * as utils_similarity from "../utils/similarity.js";
 
 import type {
@@ -35,6 +36,7 @@ declare const fullApi: ApiFromModules<{
   mutations: typeof mutations;
   testData: typeof testData;
   "utils/chunking": typeof utils_chunking;
+  "utils/jargon": typeof utils_jargon;
   "utils/similarity": typeof utils_similarity;
 }>;
 declare const fullApiWithMounts: typeof fullApi;

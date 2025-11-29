@@ -5,6 +5,7 @@ import { v } from "convex/values";
 import { embed } from "ai";
 import { openai } from "@ai-sdk/openai";
 import { chunkText } from "../utils/chunking";
+import { extractJargon } from "../utils/jargon";
 import { api } from "../_generated/api";
 
 /**
@@ -20,7 +21,7 @@ export const scrapeSource = action({
     topic: v.string(),
     sourceUrl: v.string(),
   },
-  handler: async (ctx, args): Promise<{ sessionId: string; error?: string }> => {
+  handler: async (ctx, args): Promise<{ sessionId: string; sourceText?: string; error?: string }> => {
     const { topic, sourceUrl } = args;
 
     try {
@@ -153,6 +154,9 @@ export const scrapeSource = action({
         };
       }
 
+      // Extract jargon words from the full text
+      const jargonWords = extractJargon(readableText, 30);
+
       // Generate embeddings for each chunk
       const chunksWithEmbeddings: Array<{
         text: string;
@@ -207,6 +211,7 @@ export const scrapeSource = action({
           topic,
           sourceUrl,
           chunks: chunksWithEmbeddings,
+          jargonWords,
           createdAt: Date.now(),
         });
       } catch (dbError) {
@@ -216,7 +221,7 @@ export const scrapeSource = action({
         };
       }
 
-      return { sessionId };
+      return { sessionId, sourceText: readableText };
     } catch (error: any) {
       console.error("Unexpected error in scrapeSource:", error);
       return {

@@ -4,6 +4,20 @@ export async function exportCanvasToBase64(editor: Editor): Promise<string> {
   // Export canvas as image using Editor's getSvgString method
   const shapeIds = Array.from(editor.getCurrentPageShapeIds());
   
+  // If no shapes, return empty data URL
+  if (shapeIds.length === 0) {
+    // Create a blank 800x600 canvas
+    const canvas = document.createElement('canvas');
+    canvas.width = 800;
+    canvas.height = 600;
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      ctx.fillStyle = 'white';
+      ctx.fillRect(0, 0, 800, 600);
+    }
+    return canvas.toDataURL('image/png');
+  }
+  
   // Get SVG string
   const svg = await editor.getSvgString(shapeIds, {
     background: true,

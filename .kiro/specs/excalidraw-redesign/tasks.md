@@ -1,0 +1,210 @@
+# Implementation Plan
+
+- [ ] 1. Set up Excalidraw and remove tldraw
+  - [ ] 1.1 Install @excalidraw/excalidraw package and remove tldraw from dependencies
+    - Run `pnpm remove tldraw && pnpm add @excalidraw/excalidraw`
+    - Update package.json
+    - **Manual Test:** Run `pnpm install` - should complete without errors. Check package.json has @excalidraw/excalidraw and no tldraw.
+    - _Requirements: 9.1_
+  - [ ] 1.2 Create ExcalidrawWrapper component with Next.js dynamic import
+    - Create `src/app/components/ExcalidrawWrapper.tsx`
+    - Use dynamic import with `ssr: false`
+    - Import Excalidraw CSS
+    - Configure zenModeEnabled, handleKeyboardGlobally=false
+    - **Manual Test:** Create a test page that renders ExcalidrawWrapper. Canvas should load without SSR errors, toolbar visible at top, no side panels (zen mode).
+    - _Requirements: 1.4, 1.5, 9.1_
+  - [ ] 1.3 Create TopicAreaManager utility for grid calculations
+    - Create `src/app/utils/topicAreaManager.ts`
+    - Implement `calculateTopicPosition(index)` function
+    - Implement `createBoundaryElement(index, topicId)` function
+    - Implement `filterElementsByTopic(elements, topicId)` function
+    - **Manual Test:** In browser console, call `calculateTopicPosition(0)` → should return {x:0, y:0}. Call `calculateTopicPosition(1)` → should return {x:1700, y:0}. Call `calculateTopicPosition(2)` → should return {x:0, y:1200}.
+    - _Requirements: 5.1, 5.5, 5.6_
+  - [ ]* 1.4 Write property test for grid position calculation
+    - **Property 3: Grid position calculation correctness**
+    - **Validates: Requirements 5.1**
+  - [ ]* 1.5 Write property test for element filtering by topic
+    - **Property 2: Topic element filtering accuracy**
+    - **Validates: Requirements 2.7**
+
+- [ ] 2. Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [ ] 3. Build overlay UI structure
+  - [ ] 3.1 Create OverlayContainer component with pointer-events management
+    - Create `src/app/teach/[sessionId]/[conceptIndex]/_components/OverlayContainer.tsx`
+    - Set up absolute positioning with z-index 10
+    - Configure pointer-events: none on container, auto on children
+    - **Manual Test:** Render OverlayContainer over canvas. Click on empty area → should interact with canvas (draw). Click on overlay child element → should interact with that element, not canvas.
+    - _Requirements: 1.2, 1.3_
+  - [ ] 3.2 Create InputPanel component with jargon highlighting
+    - Create `src/app/teach/[sessionId]/[conceptIndex]/_components/InputPanel.tsx`
+    - Adapt existing JargonHighlightedTextarea logic
+    - Position at bottom-left
+    - Add keyboard event stopPropagation for Excalidraw isolation
+    - **Manual Test:** Type in input field → jargon words should highlight yellow. Press 'R' key while focused → should NOT activate Excalidraw rectangle tool. Press Enter → should trigger submit.
+    - _Requirements: 2.1, 2.3, 2.5, 2.6_
+  - [ ]* 3.3 Write property test for jargon highlighting
+    - **Property 1: Jargon highlighting consistency**
+    - **Validates: Requirements 2.3**
+  - [ ] 3.4 Create MessagePanel component (collapsible)
+    - Create `src/app/teach/[sessionId]/[conceptIndex]/_components/MessagePanel.tsx`
+    - Position at top-right
+    - Implement collapse/expand toggle with icon indicator
+    - Add auto-expand on new message
+    - Support streaming content display
+    - **Manual Test:** Panel should appear top-right. Click collapse → should minimize to icon. Click icon → should expand. Add mock message → collapsed panel should auto-expand. Scroll should work when messages overflow.
+    - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5_
+  - [ ] 3.5 Create NavigationBar component
+    - Create `src/app/teach/[sessionId]/[conceptIndex]/_components/NavigationBar.tsx`
+    - Position at bottom-right
+    - Display topic name and progress (e.g., "Topic 1/5")
+    - Show "Next Topic" / "Complete Session" button conditionally
+    - **Manual Test:** Should show "Topic Name 1/5" at bottom-right. "Next Topic" button should be hidden initially, visible after dialogue. On last topic, button should say "Complete Session".
+    - _Requirements: 5.3, 6.1, 6.3_
+
+- [ ] 4. Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+
+- [ ] 5. Implement hint modal with pagination
+  - [ ] 5.1 Create HintModal component
+    - Create `src/app/teach/[sessionId]/[conceptIndex]/_components/HintModal.tsx`
+    - Center on screen with backdrop
+    - Add close button (X) in top-right
+    - Support streaming text display
+    - **Manual Test:** Open modal → should be centered with dark backdrop. Click X → modal closes. While generating, text should stream in character by character.
+    - _Requirements: 4.2, 4.6_
+  - [ ] 5.2 Add pagination controls to HintModal
+    - Implement 3-page pagination (1/3, 2/3, 3/3)
+    - Show "Generate Hint" button on pages 2 and 3
+    - Display "No more hints" indicator when all used
+    - **Manual Test:** After first hint, pagination shows "1/3". Navigate to page 2 → shows "Generate Hint" button. Generate all 3 → shows "No more hints available".
+    - _Requirements: 4.3, 4.4, 4.5, 4.7_
+  - [ ] 5.3 Create HintButton component
+    - Create hint button (?) positioned near MessagePanel
+    - Wire up to open HintModal and trigger first hint generation
+    - **Manual Test:** Click "?" button → modal opens and first hint starts generating immediately.
+    - _Requirements: 4.1, 4.2_
+
+- [ ] 6. Integrate canvas with topic management
+  - [ ] 6.1 Update TeachingLayout to use ExcalidrawWrapper
+    - Replace tldraw imports with Excalidraw
+    - Set up excalidrawAPI ref for programmatic control
+    - Pass theme prop based on system preference
+    - **Manual Test:** Navigate to /teach/[sessionId]/0 → Excalidraw canvas loads full-screen. No tldraw errors in console. Theme matches system preference.
+    - _Requirements: 1.1, 8.1, 8.3_
+  - [ ] 6.2 Implement topic area initialization
+    - Create boundary element when topic starts
+    - Tag new elements with current topicId via onChange
+    - Scroll to topic area on mount using scrollToContent API
+    - **Manual Test:** On topic load, dashed rectangle boundary should appear. Draw a shape → inspect element in console, should have customData.topicId. Canvas should be scrolled to topic area.
+    - _Requirements: 5.1, 5.5, 5.6_
+  - [ ]* 6.3 Write property test for element topic tagging
+    - **Property 4: Element topic tagging**
+    - **Validates: Requirements 5.5**
+  - [ ] 6.4 Implement viewport constraint
+    - Intercept scroll/pan events via onScrollChange
+    - Constrain viewport to current topic area boundaries
+    - **Manual Test:** Try to pan/scroll beyond the topic boundary → canvas should snap back or stop at boundary. Cannot see other topic areas while on current topic.
+    - _Requirements: 5.7_
+  - [ ]* 6.5 Write property test for viewport constraint
+    - **Property 5: Viewport constraint enforcement**
+    - **Validates: Requirements 5.7**
+
+- [ ] 7. Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [ ] 8. Implement canvas persistence and AI integration
+  - [ ] 8.1 Update canvas state storage format
+    - Modify Convex schema to store Excalidraw elements format
+    - Update saveExplanation mutation for new format
+    - **Manual Test:** Draw something, click Next Topic, refresh page → drawings should persist. Check Convex dashboard → canvasData should be Excalidraw JSON format.
+    - _Requirements: 9.2_
+  - [ ] 8.2 Implement canvas state loading
+    - Load elements from database on mount
+    - Pass to Excalidraw via initialData prop
+    - **Manual Test:** After saving drawings, navigate away and back → drawings should reload exactly as saved.
+    - _Requirements: 9.3_
+  - [ ]* 8.3 Write property test for canvas state round-trip
+    - **Property 8: Canvas state round-trip**
+    - **Validates: Requirements 9.2, 9.3**
+  - [ ] 8.4 Update canvas export for AI
+    - Create `src/app/utils/excalidrawExport.ts`
+    - Filter elements by current topic's customData tag
+    - Export filtered elements as base64 PNG
+    - **Manual Test:** Draw on topic 1, move to topic 2, draw there. Export topic 2 → should only include topic 2 drawings, not topic 1.
+    - _Requirements: 2.7, 9.4_
+  - [ ] 8.5 Wire up InputPanel submit to AI with canvas export
+    - On submit, export current topic canvas
+    - Send text + canvas image to AI service
+    - Display streaming response in MessagePanel
+    - **Manual Test:** Draw a diagram, type explanation, click Send → AI should respond referencing your drawing. Response streams into MessagePanel.
+    - _Requirements: 2.2, 2.4_
+
+- [ ] 9. Implement topic navigation
+  - [ ] 9.1 Implement "Next Topic" functionality
+    - Save current canvas state on click
+    - Calculate next topic position
+    - Scroll to next topic area with animation
+    - Update topic index state
+    - **Manual Test:** Complete dialogue on topic 1, click "Next Topic" → canvas smoothly scrolls to topic 2 area. New boundary appears. Progress shows "2/5".
+    - _Requirements: 5.2, 6.2_
+  - [ ]* 9.2 Write property test for navigation preserving elements
+    - **Property 6: Navigation preserves all elements**
+    - **Validates: Requirements 5.4**
+  - [ ] 9.3 Implement "Complete Session" navigation
+    - Save final canvas state
+    - Navigate to completion page
+    - **Manual Test:** On last topic, click "Complete Session" → navigates to /complete/[sessionId]. Canvas state is saved.
+    - _Requirements: 6.4_
+
+- [ ] 10. Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [ ] 11. Implement export functionality
+  - [ ] 11.1 Create export utilities
+    - Create `src/app/utils/sessionExport.ts`
+    - Implement exportToExcalidrawFile function
+    - Implement exportToPNG and exportToSVG functions
+    - **Manual Test:** Call each export function with mock data → should generate downloadable files in correct formats.
+    - _Requirements: 7.2, 7.3_
+  - [ ] 11.2 Update completion page with export options
+    - Add "Download as Excalidraw" button
+    - Add "Download as PNG" and "Download as SVG" buttons
+    - Load full canvas state for export
+    - **Manual Test:** On completion page, click each download button → files download. Excalidraw file opens in excalidraw.com. PNG/SVG show all topics.
+    - _Requirements: 7.1, 7.4_
+  - [ ]* 11.3 Write property test for export including all topics
+    - **Property 7: Export includes all topics**
+    - **Validates: Requirements 7.4**
+
+- [ ] 12. Implement theming
+  - [ ] 12.1 Create theme configuration
+    - Create `src/app/utils/theme.ts`
+    - Define light theme colors
+    - Define dark/Halloween theme colors (orange, purple accents)
+    - **Manual Test:** Import theme config → light theme has standard colors, dark theme has orange (#ff6b35) and purple (#9b59b6) accents.
+    - _Requirements: 8.2_
+  - [ ] 12.2 Implement theme detection and application
+    - Detect system preference using prefers-color-scheme
+    - Pass theme to Excalidraw component
+    - Apply theme to overlay UI components
+    - **Manual Test:** Set system to dark mode → Excalidraw canvas is dark, overlay buttons/panels use Halloween colors. Switch to light → everything updates.
+    - _Requirements: 8.1, 8.3, 8.4_
+
+- [ ] 13. Cleanup and migration completion
+  - [ ] 13.1 Remove old tldraw components
+    - Delete `src/app/components/DrawingCanvas.tsx`
+    - Delete old LeftPanel and RightPanel components
+    - Update any remaining tldraw imports
+    - **Manual Test:** Search codebase for "tldraw" → no results. App builds without errors. No unused component files.
+    - _Requirements: 9.1_
+  - [ ] 13.2 Update canvasExport utility
+    - Replace tldraw export logic with Excalidraw export
+    - Update `src/app/utils/canvasExport.ts`
+    - **Manual Test:** Export canvas → generates valid PNG. No tldraw references in export code.
+    - _Requirements: 9.4_
+
+- [ ] 14. Final Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.

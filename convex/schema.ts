@@ -11,6 +11,45 @@ export default defineSchema({
       embedding: v.array(v.float64()),
       index: v.number(),
     })),
+    jargonWords: v.array(v.string()),
+    concepts: v.optional(v.array(v.object({
+      id: v.string(),
+      title: v.string(),
+      description: v.string(),
+    }))),
     createdAt: v.number(),
   }).index("by_session", ["sessionId"]),
+
+  sessions: defineTable({
+    sessionId: v.string(),
+    topic: v.string(),
+    concepts: v.array(v.object({
+      id: v.string(),
+      title: v.string(),
+      description: v.string(),
+    })),
+    currentConceptIndex: v.number(),
+    dialogues: v.array(v.object({
+      conceptId: v.string(),
+      messages: v.array(v.object({
+        role: v.string(),
+        content: v.string(),
+        timestamp: v.number(),
+        type: v.optional(v.string()),
+      })),
+    })),
+    explanations: v.optional(v.array(v.object({
+      conceptId: v.string(),
+      textExplanation: v.string(),
+      canvasData: v.optional(v.string()), // Store canvas snapshot as base64 or JSON
+    }))),
+    summary: v.optional(v.object({
+      text: v.string(),
+      keyConceptsCovered: v.array(v.string()),
+      analogiesUsed: v.array(v.string()),
+    })),
+    completed: v.boolean(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  }).index("by_session_id", ["sessionId"]),
 });

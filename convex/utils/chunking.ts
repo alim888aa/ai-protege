@@ -25,24 +25,32 @@ export function chunkText(
     // Calculate end index for this chunk
     let endIndex = startIndex + maxChunkSize;
 
-    // If this is not the last chunk, try to break at a sentence boundary
+    // If this is not the last chunk, try to break at a paragraph or sentence boundary
     if (endIndex < text.length) {
-      // Look for sentence endings (., !, ?) within the last 100 characters of the chunk
-      const searchStart = Math.max(startIndex, endIndex - 100);
+      // Look for paragraph breaks within the last 200 characters of the chunk
+      const searchStart = Math.max(startIndex, endIndex - 200);
       const searchText = text.substring(searchStart, endIndex);
-      const sentenceEndings = ['. ', '! ', '? ', '.\n', '!\n', '?\n'];
       
-      let lastSentenceEnd = -1;
-      for (const ending of sentenceEndings) {
-        const pos = searchText.lastIndexOf(ending);
-        if (pos > lastSentenceEnd) {
-          lastSentenceEnd = pos;
+      // First, try to find paragraph breaks (double newlines)
+      const paragraphBreak = searchText.lastIndexOf('\n\n');
+      if (paragraphBreak !== -1) {
+        endIndex = searchStart + paragraphBreak + 2;
+      } else {
+        // If no paragraph break, look for sentence endings
+        const sentenceEndings = ['. ', '! ', '? ', '.\n', '!\n', '?\n'];
+        
+        let lastSentenceEnd = -1;
+        for (const ending of sentenceEndings) {
+          const pos = searchText.lastIndexOf(ending);
+          if (pos > lastSentenceEnd) {
+            lastSentenceEnd = pos;
+          }
         }
-      }
 
-      // If we found a sentence boundary, use it
-      if (lastSentenceEnd !== -1) {
-        endIndex = searchStart + lastSentenceEnd + 1;
+        // If we found a sentence boundary, use it
+        if (lastSentenceEnd !== -1) {
+          endIndex = searchStart + lastSentenceEnd + 1;
+        }
       }
     } else {
       // This is the last chunk, take everything remaining
