@@ -16,6 +16,7 @@ export const createTestData = mutation({
     await ctx.db.insert("sourceMaterial", {
       sessionId,
       topic: "React Hooks",
+      sourceType: "url",
       sourceUrl: "https://example.com/test",
       chunks: [
         {
@@ -79,6 +80,7 @@ export const createTestSessionWithDialogues = mutation({
     await ctx.db.insert("sourceMaterial", {
       sessionId,
       topic: "Photosynthesis",
+      sourceType: "url",
       sourceUrl: "https://example.com/photosynthesis",
       chunks: [
         {

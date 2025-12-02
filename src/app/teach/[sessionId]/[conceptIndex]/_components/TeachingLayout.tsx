@@ -1,13 +1,21 @@
 'use client';
 
-import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
-import { Editor } from 'tldraw';
-import { useAction, useMutation } from 'convex/react';
-import { api } from '../../../../../../convex/_generated/api';
+import { useMemo, useState, useEffect } from 'react';
 import { useInactivityTimer } from '@/app/hooks/useInactivityTimer';
-import { LeftPanel } from './LeftPanel';
-import { RightPanel } from './RightPanel';
+import { useSystemTheme } from '@/app/hooks/useSystemTheme';
+import { ExcalidrawWrapper } from '@/app/components/ExcalidrawWrapper';
+import { OverlayContainer } from './OverlayContainer';
+import { InputPanel } from './InputPanel';
+import { MessagePanel } from './MessagePanel';
+import { NavigationBar } from './NavigationBar';
+import { HintButton } from './HintButton';
+import { HintModal } from './HintModal';
+import { ErrorBanner } from './ErrorBanner';
+import { OutOfBoundsWarning } from './OutOfBoundsWarning';
+import { TeachingWelcomeScreen } from './TeachingWelcomeScreen';
+import { calculateTopicPosition, createBoundaryElement, defaultTopicAreaConfig } from '@/app/utils/topicAreaManager';
+import { useTeachingReducer, Message } from './useTeachingReducer';
+import { useCanvasHandlers, useDialogueHandlers, useNavigationHandlers } from './hooks';
 
 interface Concept {
   id: string;
@@ -15,16 +23,14 @@ interface Concept {
   description: string;
 }
 
-interface Message {
-  role: string;
-  content: string;
-  timestamp: number;
-  type?: 'hint' | 'message';
-}
-
 interface Dialogue {
   conceptId: string;
-  messages: Message[];
+  messages: Array<{
+    role: string;
+    content: string;
+    timestamp: number;
+    type?: string;
+  }>;
 }
 
 interface Explanation {
@@ -33,16 +39,8 @@ interface Explanation {
   canvasData?: string;
 }
 
-interface Session {
-  topic: string;
-  concepts: Concept[];
-  dialogues: Dialogue[];
-  explanations?: Explanation[];
-}
-
 interface TeachingLayoutProps {
   sessionId: string;
-  session: Session;
   conceptIndex: number;
   currentConcept: Concept;
   totalConcepts: number;
@@ -52,177 +50,189 @@ interface TeachingLayoutProps {
 
 export function TeachingLayout({
   sessionId,
-  session,
   conceptIndex,
   currentConcept,
   totalConcepts,
   currentDialogue,
   currentExplanation,
 }: TeachingLayoutProps) {
-  const router = useRouter();
+  const theme = useSystemTheme();
+  const { state, actions } = useTeachingReducer();
+  const { resetTimer } = useInactivityTimer(30000);
 
-  // Local state
-  const [textExplanation, setTextExplanation] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [hintCount, setHintCount] = useState(0);
-  const [isGeneratingHint, setIsGeneratingHint] = useState(false);
-  const [ragChunks, setRagChunks] = useState<Array<{ text: string; similarity: number; index: number }>>([]);
-  const [dialogueInput, setDialogueInput] = useState('');
-  const [isStreamingResponse, setIsStreamingResponse] = useState(false);
-  const [streamingContent, setStreamingContent] = useState('');
-  // Optimistic messages that haven't been synced to the database yet
-  const [optimisticMessages, setOptimisticMessages] = useState<Array<{ role: 'user' | 'ai'; content: string; timestamp: number; type?: 'hint' | 'message' }>>([]);
+  // Show welcome screen only on first topic of each session
+  const welcomeKey = `teaching-welcome-${sessionId}`;
+  const [showWelcome, setShowWelcome] = useState(false);
 
-  // Refs
-  const editorRef = useRef<Editor | null>(null);
-  const lastConceptIdRef = useRef<string | null>(null);
-
-  // Hooks
-  const { showHintButton, resetTimer } = useInactivityTimer(30000);
-  const retrieveRelevantChunks = useAction(api.actions.retrieveRelevantChunks.retrieveRelevantChunks);
-  const saveExplanation = useMutation(api.mutations.saveExplanation);
-  const updateProgress = useMutation(api.mutations.updateProgress);
-
-  // Derived data - combine database messages with optimistic messages
-  const dialogueMessages = useMemo(() => {
-    const dbMessages = currentDialogue?.messages?.map((msg) => ({
-      ...msg,
-      role: msg.role as 'user' | 'ai',
-      type: (msg as Message).type,
-    })) || [];
-    
-    // Filter out optimistic messages that are now in the database
-    const dbTimestamps = new Set(dbMessages.map(m => m.timestamp));
-    const pendingOptimistic = optimisticMessages.filter(m => !dbTimestamps.has(m.timestamp));
-    
-    return [...dbMessages, ...pendingOptimistic];
-  }, [currentDialogue?.messages, optimisticMessages]);
-  
-  // Clear optimistic messages when they appear in the database
   useEffect(() => {
-    if (currentDialogue?.messages && optimisticMessages.length > 0) {
-      const dbTimestamps = new Set(currentDialogue.messages.map(m => m.timestamp));
-      const stillPending = optimisticMessages.filter(m => !dbTimestamps.has(m.timestamp));
-      if (stillPending.length !== optimisticMessages.length) {
-        setOptimisticMessages(stillPending);
+    // Only show on first topic and if not dismissed for this session
+    if (conceptIndex === 0) {
+      const dismissed = sessionStorage.getItem(welcomeKey);
+      if (!dismissed) {
+        setShowWelcome(true);
       }
     }
-  }, [currentDialogue?.messages, optimisticMessages]);
+  }, [conceptIndex, welcomeKey]);
+
+  const handleDismissWelcome = () => {
+    setShowWelcome(false);
+    sessionStorage.setItem(welcomeKey, 'true');
+  };
+
+  // Canvas handlers
+  const {
+    excalidrawApiRef,
+    canvasElementsRef,
+    isOutOfBounds,
+    handleElementsChange,
+    handleApiReady,
+    handleScrollChange,
+    scrollToTopic,
+  } = useCanvasHandlers(conceptIndex, resetTimer);
+
+  // Messages from Convex + pending user message for optimistic UI
+  const dialogueMessages: Message[] = useMemo(() => {
+    const dbMessages = (currentDialogue?.messages ?? []).map((msg, idx) => ({
+      id: `db-${msg.timestamp}-${idx}`,
+      role: msg.role as 'user' | 'ai',
+      content: msg.content,
+      timestamp: msg.timestamp,
+      type: msg.type as 'hint' | 'message' | undefined,
+    }));
+
+    if (state.pendingUserMessage) {
+      return [
+        ...dbMessages,
+        {
+          id: 'pending-user',
+          role: 'user' as const,
+          content: state.pendingUserMessage,
+          timestamp: Date.now(),
+        },
+      ];
+    }
+    return dbMessages;
+  }, [currentDialogue?.messages, state.pendingUserMessage]);
+
+  // Dialogue handlers
+  const { handleSubmit, handleGenerateHint, handleHintClick } = useDialogueHandlers({
+    sessionId,
+    currentConcept,
+    canvasElementsRef,
+    dialogueMessages,
+    state,
+    actions,
+  });
+
+  // Navigation handlers
+  const { handleNextTopic, handleBackToDashboard, handleCompleteSession } = useNavigationHandlers({
+    sessionId,
+    conceptIndex,
+    totalConcepts,
+    currentConceptId: currentConcept.id,
+    dialogueInput: state.dialogueInput,
+    canvasElementsRef,
+    excalidrawApiRef,
+  });
+
+  // Initial canvas state - filter out old boundaries and add fresh one with current dimensions
+  const initialElements = useMemo(() => {
+    const boundary = createBoundaryElement(conceptIndex, currentConcept.id);
+    if (currentExplanation?.canvasData) {
+      try {
+        const saved = JSON.parse(currentExplanation.canvasData) as Array<{ customData?: { isBoundary?: boolean } }>;
+        // Filter out old boundary elements to avoid duplicates with different sizes
+        const withoutBoundaries = saved.filter((el) => !el.customData?.isBoundary);
+        return [boundary, ...withoutBoundaries];
+      } catch {
+        return [boundary];
+      }
+    }
+    return [boundary];
+  }, [conceptIndex, currentConcept.id, currentExplanation?.canvasData]);
+
+  const initialAppState = useMemo(() => {
+    const pos = calculateTopicPosition(conceptIndex);
+    const { width, height } = defaultTopicAreaConfig;
+    // Center the topic area in the viewport
+    const centerX = pos.x + width / 2;
+    const centerY = pos.y + height / 2;
+    // Use reasonable defaults for SSR, will be correct on client
+    const viewportWidth = typeof window !== 'undefined' ? window.innerWidth : 1920;
+    const viewportHeight = typeof window !== 'undefined' ? window.innerHeight : 1080;
+    return {
+      scrollX: -(centerX - viewportWidth / 2),
+      scrollY: -(centerY - viewportHeight / 2),
+      zoom: { value: 1 },
+    };
+  }, [conceptIndex]);
 
   const showMoveToNext = dialogueMessages.length >= 2;
 
-  // Initialize when concept changes
-  useEffect(() => {
-    if (!currentConcept?.id || lastConceptIdRef.current === currentConcept.id) return;
-
-    lastConceptIdRef.current = currentConcept.id;
-    setHintCount(0);
-    setRagChunks([]);
-    setTextExplanation(currentExplanation?.textExplanation || '');
-
-    if (editorRef.current) {
-      const existingShapeIds = Array.from(editorRef.current.getCurrentPageShapeIds());
-      editorRef.current.deleteShapes(existingShapeIds);
-
-      if (currentExplanation?.canvasData) {
-        try {
-          const shapes = JSON.parse(currentExplanation.canvasData);
-          shapes.forEach((shape: any) => {
-            if (shape) editorRef.current!.createShape(shape);
-          });
-        } catch (err) {
-          console.error('Error loading canvas:', err);
-        }
-      }
-    }
-  }, [currentConcept?.id, currentExplanation]);
-
-  // Handlers
-  const handleTextChange = (value: string) => {
-    setTextExplanation(value);
-    resetTimer();
-  };
-
-  const handleEditorMount = (editor: Editor) => {
-    editorRef.current = editor;
-    editor.store.listen(() => resetTimer(), { scope: 'document' });
-
-    if (currentExplanation?.canvasData) {
-      try {
-        const shapes = JSON.parse(currentExplanation.canvasData);
-        shapes.forEach((shape: any) => {
-          if (shape) editor.createShape(shape);
-        });
-      } catch (err) {
-        console.error('Error loading canvas on mount:', err);
-      }
-    }
-  };
-
-  const handleMoveToNext = useCallback(async () => {
-    const nextIndex = conceptIndex + 1;
-    
-    // Persist the progress to the session
-    try {
-      await updateProgress({ sessionId, conceptIndex: nextIndex });
-    } catch (err) {
-      console.error('Failed to update progress:', err);
-    }
-    
-    if (nextIndex < totalConcepts) {
-      router.push(`/teach/${sessionId}/${nextIndex}`);
-    } else {
-      router.push(`/complete/${sessionId}`);
-    }
-  }, [conceptIndex, totalConcepts, sessionId, updateProgress, router]);
-
   return (
-    <div className="flex h-screen bg-gray-50 dark:bg-zinc-900 page-transition">
-      <LeftPanel
-        sessionId={sessionId}
-        topic={session.topic}
-        currentConcept={currentConcept}
-        conceptIndex={conceptIndex}
-        totalConcepts={totalConcepts}
-        textExplanation={textExplanation}
-        isSubmitting={isSubmitting}
-        onTextChange={handleTextChange}
-        onEditorMount={handleEditorMount}
+    <div className="relative w-screen h-screen overflow-hidden bg-gray-50 dark:bg-zinc-900">
+      {/* Canvas */}
+      <div className="absolute inset-0 z-0">
+        <ExcalidrawWrapper
+          initialElements={initialElements}
+          initialAppState={initialAppState}
+          onElementsChange={handleElementsChange}
+          onApiReady={handleApiReady}
+          onScrollChange={handleScrollChange}
+          theme={theme}
+        />
+      </div>
+
+      {/* Overlay UI */}
+      <OverlayContainer>
+        <MessagePanel
+          messages={dialogueMessages}
+          isCollapsed={state.isMessagePanelCollapsed}
+          onToggleCollapse={actions.toggleMessagePanel}
+          isStreaming={state.isStreaming}
+          streamingContent={state.streamingContent}
+        />
+        <HintButton onClick={handleHintClick} hintCount={state.hintCount} isGenerating={state.isGeneratingHint} />
+        <InputPanel
+          value={state.dialogueInput}
+          onChange={actions.setInput}
+          onSubmit={handleSubmit}
+          isSubmitting={state.isSubmitting}
+          jargonWords={[]}
+        />
+        <NavigationBar
+          topicName={currentConcept.title}
+          currentIndex={conceptIndex}
+          totalTopics={totalConcepts}
+          canProceed={showMoveToNext}
+          isLastTopic={conceptIndex === totalConcepts - 1}
+          onNextTopic={handleNextTopic}
+          onCompleteSession={handleCompleteSession}
+          onBackToDashboard={handleBackToDashboard}
+        />
+      </OverlayContainer>
+
+      {/* Modals & Banners */}
+      <HintModal
+        isOpen={state.isHintModalOpen}
+        onClose={actions.closeHintModal}
+        hints={state.hints}
+        currentPage={state.currentHintPage}
+        onPageChange={actions.setHintPage}
+        onGenerateHint={handleGenerateHint}
+        isGenerating={state.isGeneratingHint}
+        streamingHint={state.streamingHint}
       />
-      <RightPanel
-        sessionId={sessionId}
-        currentConcept={currentConcept}
-        currentDialogue={currentDialogue}
-        dialogueMessages={dialogueMessages}
-        dialogueInput={dialogueInput}
-        setDialogueInput={setDialogueInput}
-        isSubmitting={isSubmitting}
-        setIsSubmitting={setIsSubmitting}
-        isStreamingResponse={isStreamingResponse}
-        setIsStreamingResponse={setIsStreamingResponse}
-        streamingContent={streamingContent}
-        setStreamingContent={setStreamingContent}
-        error={error}
-        setError={setError}
-        showMoveToNext={showMoveToNext}
-        showHintButton={showHintButton}
-        hintCount={hintCount}
-        setHintCount={setHintCount}
-        isGeneratingHint={isGeneratingHint}
-        setIsGeneratingHint={setIsGeneratingHint}
-        ragChunks={ragChunks}
-        setRagChunks={setRagChunks}
-        textExplanation={textExplanation}
-        editorRef={editorRef}
-        resetTimer={resetTimer}
-        retrieveRelevantChunks={retrieveRelevantChunks}
-        saveExplanation={saveExplanation}
-        onMoveToNext={handleMoveToNext}
-        conceptIndex={conceptIndex}
-        totalConcepts={totalConcepts}
-        addOptimisticMessage={(msg) => setOptimisticMessages(prev => [...prev, msg])}
-      />
+      <ErrorBanner error={state.error} onDismiss={() => actions.setError(null)} />
+      <OutOfBoundsWarning isVisible={isOutOfBounds} onScrollBack={scrollToTopic} />
+
+      {/* Welcome Screen */}
+      {showWelcome && (
+        <TeachingWelcomeScreen
+          topicName={currentConcept.title}
+          onDismiss={handleDismissWelcome}
+        />
+      )}
     </div>
   );
 }

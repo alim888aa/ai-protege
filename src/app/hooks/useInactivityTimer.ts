@@ -8,7 +8,15 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 export function useInactivityTimer(timeoutMs: number = 30000) {
   const [showHintButton, setShowHintButton] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  // Use ref to avoid recreating resetTimer when timeoutMs changes
+  const timeoutMsRef = useRef(timeoutMs);
+  
+  // Keep the ref in sync with the prop
+  useEffect(() => {
+    timeoutMsRef.current = timeoutMs;
+  }, [timeoutMs]);
 
+  // Stable resetTimer function - no dependencies means it won't change
   const resetTimer = useCallback(() => {
     // Clear existing timer
     if (timerRef.current) {
@@ -18,13 +26,13 @@ export function useInactivityTimer(timeoutMs: number = 30000) {
     // Hide hint button
     setShowHintButton(false);
 
-    // Start new timer
+    // Start new timer using ref value
     timerRef.current = setTimeout(() => {
       setShowHintButton(true);
-    }, timeoutMs);
-  }, [timeoutMs]);
+    }, timeoutMsRef.current);
+  }, []);
 
-  // Initialize timer on mount
+  // Initialize timer on mount only
   useEffect(() => {
     resetTimer();
 

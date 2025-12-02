@@ -50,7 +50,6 @@ export function TeachingClient({ sessionId, conceptIndex }: TeachingClientProps)
   return (
     <TeachingLayout
       sessionId={sessionId}
-      session={session}
       conceptIndex={conceptIndex}
       currentConcept={currentConcept}
       totalConcepts={totalConcepts}

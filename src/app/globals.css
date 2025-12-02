@@ -180,6 +180,16 @@ body {
   }
 }
 
+/* Hide scrollbar but keep scroll functionality */
+.scrollbar-hidden {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari, Opera */
+}
+
 /* Loading shimmer effect */
 @keyframes shimmer {
   0% {
@@ -199,4 +209,19 @@ body {
   );
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
+}
+
+/* ===== Overlay UI for Excalidraw Canvas ===== */
+
+/* Overlay container - clicks pass through by default */
+.overlay-container {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* Interactive overlay elements capture clicks */
+.overlay-container > * {
+  pointer-events: auto;
 }

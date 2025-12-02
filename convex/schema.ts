@@ -3,9 +3,12 @@ import { v } from "convex/values";
 
 export default defineSchema({
   sourceMaterial: defineTable({
+    userId: v.optional(v.string()), // Clerk user ID - optional for backwards compatibility
     sessionId: v.string(),
     topic: v.string(),
-    sourceUrl: v.string(),
+    // Optional for backwards compatibility with existing data
+    sourceType: v.optional(v.union(v.literal("url"), v.literal("pdf"), v.literal("none"))),
+    sourceUrl: v.optional(v.string()),
     chunks: v.array(v.object({
       text: v.string(),
       embedding: v.array(v.float64()),
@@ -18,11 +21,17 @@ export default defineSchema({
       description: v.string(),
     }))),
     createdAt: v.number(),
-  }).index("by_session", ["sessionId"]),
+  })
+    .index("by_session", ["sessionId"])
+    .index("by_user", ["userId"]),
 
   sessions: defineTable({
+    userId: v.optional(v.string()), // Clerk user ID - optional for backwards compatibility
     sessionId: v.string(),
     topic: v.string(),
+    // Denormalized from sourceMaterial for efficient dashboard queries
+    sourceType: v.optional(v.union(v.literal("url"), v.literal("pdf"), v.literal("none"))),
+    sourceUrl: v.optional(v.string()),
     concepts: v.array(v.object({
       id: v.string(),
       title: v.string(),
@@ -51,5 +60,7 @@ export default defineSchema({
     completed: v.boolean(),
     createdAt: v.number(),
     updatedAt: v.number(),
-  }).index("by_session_id", ["sessionId"]),
+  })
+    .index("by_session_id", ["sessionId"])
+    .index("by_user", ["userId"]),
 });

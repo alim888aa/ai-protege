@@ -209,6 +209,7 @@ export const scrapeSource = action({
         await ctx.runMutation(api.mutations.createSourceMaterial, {
           sessionId,
           topic,
+          sourceType: "url",
           sourceUrl,
           chunks: chunksWithEmbeddings,
           jargonWords,

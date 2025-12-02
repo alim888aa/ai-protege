@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as actions_processPdf from "../actions/processPdf.js";
 import type * as actions_retrieveRelevantChunks from "../actions/retrieveRelevantChunks.js";
 import type * as actions_scrapeSource from "../actions/scrapeSource.js";
 import type * as mutations from "../mutations.js";
@@ -31,6 +32,7 @@ import type {
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  "actions/processPdf": typeof actions_processPdf;
   "actions/retrieveRelevantChunks": typeof actions_retrieveRelevantChunks;
   "actions/scrapeSource": typeof actions_scrapeSource;
   mutations: typeof mutations;

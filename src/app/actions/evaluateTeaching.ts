@@ -80,7 +80,7 @@ Return structured JSON output with your evaluation.`;
 
   // Use generateObject to get structured evaluation
   const evaluation = await generateObject({
-    model: openai('gpt-5-mini-2025-08-07'),
+    model: openai('gpt-4.1-mini'),
     messages: [{ role: 'user', content: evaluationPrompt }],
     schema: evaluationSchema,
   });

@@ -1,7 +1,8 @@
 'use client';
 
 import { MutableRefObject } from 'react';
-import { Editor } from 'tldraw';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Editor = any;
 import { exportCanvasToBase64 } from '@/app/utils/canvasExport';
 import { generateDialogueResponse } from '@/app/actions/generateDialogueResponse';
 import { generateHint } from '@/app/actions/generateHint';

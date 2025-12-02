@@ -8,7 +8,8 @@ export const createSourceMaterial = mutation({
   args: {
     sessionId: v.string(),
     topic: v.string(),
-    sourceUrl: v.string(),
+    sourceType: v.union(v.literal("url"), v.literal("pdf"), v.literal("none")),
+    sourceUrl: v.optional(v.string()),
     chunks: v.array(
       v.object({
         text: v.string(),
@@ -27,9 +28,16 @@ export const createSourceMaterial = mutation({
     createdAt: v.number(),
   },
   handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Not authenticated");
+    }
+
     await ctx.db.insert("sourceMaterial", {
+      userId: identity.subject,
       sessionId: args.sessionId,
       topic: args.topic,
+      sourceType: args.sourceType,
       sourceUrl: args.sourceUrl,
       chunks: args.chunks,
       jargonWords: args.jargonWords,
@@ -97,6 +105,8 @@ export const createSession = mutation({
   args: {
     sessionId: v.string(),
     topic: v.string(),
+    sourceType: v.optional(v.union(v.literal("url"), v.literal("pdf"), v.literal("none"))),
+    sourceUrl: v.optional(v.string()),
     concepts: v.array(
       v.object({
         id: v.string(),
@@ -106,11 +116,19 @@ export const createSession = mutation({
     ),
   },
   handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Not authenticated");
+    }
+
     const now = Date.now();
     
     await ctx.db.insert("sessions", {
+      userId: identity.subject,
       sessionId: args.sessionId,
       topic: args.topic,
+      sourceType: args.sourceType,
+      sourceUrl: args.sourceUrl,
       concepts: args.concepts,
       currentConceptIndex: 0,
       dialogues: [],
@@ -333,6 +351,32 @@ export const saveExplanation = mutation({
 
 
 /**
+ * Creates a source material entry with no source (manual concepts mode)
+ */
+export const createManualSourceMaterial = mutation({
+  args: {
+    sessionId: v.string(),
+    topic: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Not authenticated");
+    }
+
+    await ctx.db.insert("sourceMaterial", {
+      userId: identity.subject,
+      sessionId: args.sessionId,
+      topic: args.topic,
+      sourceType: "none",
+      chunks: [],
+      jargonWords: [],
+      createdAt: Date.now(),
+    });
+  },
+});
+
+/**
  * Saves the AI-generated summary for a session
  */
 export const saveSummary = mutation({
@@ -358,5 +402,78 @@ export const saveSummary = mutation({
       summary: args.summary,
       updatedAt: Date.now(),
     });
+  },
+});
+
+
+// ============================================
+// Dashboard Queries & Mutations
+// ============================================
+
+/**
+ * Gets all sessions for the current authenticated user
+ * Returns sessions sorted by most recently updated first
+ * sourceType and sourceUrl are now denormalized in the sessions table
+ */
+export const getUserSessions = query({
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      return [];
+    }
+
+    const sessions = await ctx.db
+      .query("sessions")
+      .withIndex("by_user", (q) => q.eq("userId", identity.subject))
+      .collect();
+
+    // Sort by updatedAt descending (most recent first)
+    return sessions.sort((a, b) => b.updatedAt - a.updatedAt);
+  },
+});
+
+/**
+ * Deletes a session and its associated source material
+ * Verifies ownership before deletion
+ */
+export const deleteSession = mutation({
+  args: {
+    sessionId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Not authenticated");
+    }
+
+    // Find the session
+    const session = await ctx.db
+      .query("sessions")
+      .withIndex("by_session_id", (q) => q.eq("sessionId", args.sessionId))
+      .first();
+
+    if (!session) {
+      throw new Error("Session not found");
+    }
+
+    // Verify ownership
+    if (session.userId !== identity.subject) {
+      throw new Error("Not authorized to delete this session");
+    }
+
+    // Delete associated source material
+    const sourceMaterial = await ctx.db
+      .query("sourceMaterial")
+      .withIndex("by_session", (q) => q.eq("sessionId", args.sessionId))
+      .first();
+
+    if (sourceMaterial) {
+      await ctx.db.delete(sourceMaterial._id);
+    }
+
+    // Delete the session
+    await ctx.db.delete(session._id);
+
+    return { success: true };
   },
 });
