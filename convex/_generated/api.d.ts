@@ -13,7 +13,6 @@ import type * as actions_retrieveRelevantChunks from "../actions/retrieveRelevan
 import type * as actions_scrapeSource from "../actions/scrapeSource.js";
 import type * as http from "../http.js";
 import type * as mutations from "../mutations.js";
-import type * as streaming_mutations from "../streaming/mutations.js";
 import type * as testData from "../testData.js";
 import type * as utils_chunking from "../utils/chunking.js";
 import type * as utils_jargon from "../utils/jargon.js";
@@ -39,7 +38,6 @@ declare const fullApi: ApiFromModules<{
   "actions/scrapeSource": typeof actions_scrapeSource;
   http: typeof http;
   mutations: typeof mutations;
-  "streaming/mutations": typeof streaming_mutations;
   testData: typeof testData;
   "utils/chunking": typeof utils_chunking;
   "utils/jargon": typeof utils_jargon;
@@ -56,40 +54,4 @@ export declare const internal: FilterApi<
   FunctionReference<any, "internal">
 >;
 
-export declare const components: {
-  persistentTextStreaming: {
-    lib: {
-      addChunk: FunctionReference<
-        "mutation",
-        "internal",
-        { final: boolean; streamId: string; text: string },
-        any
-      >;
-      createStream: FunctionReference<"mutation", "internal", {}, any>;
-      getStreamStatus: FunctionReference<
-        "query",
-        "internal",
-        { streamId: string },
-        "pending" | "streaming" | "done" | "error" | "timeout"
-      >;
-      getStreamText: FunctionReference<
-        "query",
-        "internal",
-        { streamId: string },
-        {
-          status: "pending" | "streaming" | "done" | "error" | "timeout";
-          text: string;
-        }
-      >;
-      setStreamStatus: FunctionReference<
-        "mutation",
-        "internal",
-        {
-          status: "pending" | "streaming" | "done" | "error" | "timeout";
-          streamId: string;
-        },
-        any
-      >;
-    };
-  };
-};
+export declare const components: {};

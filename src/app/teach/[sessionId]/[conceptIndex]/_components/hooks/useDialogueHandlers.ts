@@ -53,7 +53,6 @@ export function useDialogueHandlers({
 }: UseDialogueHandlersProps) {
   const saveExplanation = useMutation(api.mutations.saveExplanation);
   const saveDialogue = useMutation(api.mutations.saveDialogue);
-  const createStream = useMutation(api.streaming.mutations.createStream);
 
 
   const handleSubmit = useCallback(async () => {
@@ -86,17 +85,13 @@ export function useDialogueHandlers({
       // Use Convex HTTP streaming for sessions with source material
       // Fall back to Vercel API for manual sessions without source
       if (hasSourceMaterial) {
-        // Create a stream ID first
-        const { streamId } = await createStream({});
-
-        // Start the HTTP stream request (don't await - it streams)
+        // Start the HTTP stream request
         const streamPromise = fetch(`${CONVEX_SITE_URL}/chat-stream`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             sessionId,
             conceptId: currentConcept.id,
-            streamId,
             userMessage: userContent,
             canvasImage: canvasImage ?? undefined,
             dialogueHistory: allMessages.map((m) => ({ role: m.role, content: m.content })),
@@ -198,7 +193,6 @@ export function useDialogueHandlers({
     saveExplanation,
     saveDialogue,
     hasSourceMaterial,
-    createStream,
   ]);
 
 
@@ -215,9 +209,6 @@ export function useDialogueHandlers({
 
         // Use Convex HTTP streaming for sessions with source material
         if (hasSourceMaterial) {
-          // Create a stream ID first
-          const { streamId } = await createStream({});
-
           // Start the HTTP stream request
           const response = await fetch(`${CONVEX_SITE_URL}/hint-stream`, {
             method: 'POST',
@@ -225,7 +216,6 @@ export function useDialogueHandlers({
             body: JSON.stringify({
               sessionId,
               conceptId: currentConcept.id,
-              streamId,
               hintCount: hintNumber,
               userExplanation: userProgress || '',
               dialogueHistory: dialogueMessages.map((m) => ({ role: m.role, content: m.content })),
@@ -303,7 +293,7 @@ export function useDialogueHandlers({
         actions.hintGenerateError(err instanceof Error ? err.message : 'Failed to generate hint');
       }
     },
-    [state.isGeneratingHint, actions, currentConcept, dialogueMessages, canvasElementsRef, hasSourceMaterial, sessionId, createStream]
+    [state.isGeneratingHint, actions, currentConcept, dialogueMessages, canvasElementsRef, hasSourceMaterial, sessionId]
   );
 
   const handleHintClick = useCallback(() => {

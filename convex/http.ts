@@ -2,10 +2,7 @@ import { httpRouter } from "convex/server";
 import { httpAction } from "./_generated/server";
 import { streamText } from "ai";
 import { openai } from "@ai-sdk/openai";
-import { api, components } from "./_generated/api";
-import { PersistentTextStreaming } from "@convex-dev/persistent-text-streaming";
-
-const streaming = new PersistentTextStreaming(components.persistentTextStreaming);
+import { api } from "./_generated/api";
 
 const http = httpRouter();
 
@@ -44,10 +41,9 @@ http.route({
   method: "POST",
   handler: httpAction(async (ctx, request) => {
     const body = await request.json();
-    const { sessionId, conceptId, streamId, userMessage, canvasImage, dialogueHistory } = body as {
+    const { sessionId, conceptId, userMessage, canvasImage, dialogueHistory } = body as {
       sessionId: string;
       conceptId: string;
-      streamId: string;
       userMessage: string;
       canvasImage?: string;
       dialogueHistory: Array<{ role: string; content: string }>;
@@ -92,32 +88,17 @@ http.route({
     // 5. Build messages array with multimodal support
     const messages = buildMessages(dialogueHistory, userMessage, canvasImage);
 
-    // 6. Stream to client and save deltas to database
-    const streamResponse = await streaming.stream(ctx, request, streamId as import("@convex-dev/persistent-text-streaming").StreamId, async (_ctx, _req, _id, append) => {
-      // Stream the response using AI SDK
-      const response = streamText({
-        model: openai("gpt-4.1-nano"),
-        system: systemPrompt,
-        messages,
-        temperature: 0.8,
-      });
-
-      // Iterate over the text stream and append each chunk
-      for await (const chunk of response.textStream) {
-        await append(chunk);
-      }
+    // 6. Stream the response using AI SDK and return as streaming response
+    const response = streamText({
+      model: openai("gpt-4.1-nano"),
+      system: systemPrompt,
+      messages,
+      temperature: 0.8,
     });
 
-    // Add CORS headers to the streaming response
-    const newHeaders = new Headers(streamResponse.headers);
-    Object.entries(corsHeaders).forEach(([key, value]) => {
-      newHeaders.set(key, value);
-    });
-
-    return new Response(streamResponse.body, {
-      status: streamResponse.status,
-      statusText: streamResponse.statusText,
-      headers: newHeaders,
+    // Return the text stream directly as HTTP response
+    return response.toTextStreamResponse({
+      headers: corsHeaders,
     });
   }),
 });
@@ -129,10 +110,9 @@ http.route({
   method: "POST",
   handler: httpAction(async (ctx, request) => {
     const body = await request.json();
-    const { sessionId, conceptId, streamId, hintCount, userExplanation, dialogueHistory } = body as {
+    const { sessionId, conceptId, hintCount, userExplanation, dialogueHistory } = body as {
       sessionId: string;
       conceptId: string;
-      streamId: string;
       hintCount: number;
       userExplanation: string;
       dialogueHistory: Array<{ role: string; content: string }>;
@@ -174,32 +154,17 @@ http.route({
     // 4. Build hint system prompt
     const systemPrompt = buildHintSystemPrompt(concept, ragChunks, hasSource, hintCount, userExplanation, dialogueHistory);
 
-    // 5. Stream to client and save deltas to database
-    const streamResponse = await streaming.stream(ctx, request, streamId as import("@convex-dev/persistent-text-streaming").StreamId, async (_ctx, _req, _id, append) => {
-      // Stream the response using AI SDK
-      const response = streamText({
-        model: openai("gpt-4.1-mini"),
-        system: systemPrompt,
-        messages: [{ role: "user", content: "Please provide a hint to help me." }],
-        temperature: 0.7,
-      });
-
-      // Iterate over the text stream and append each chunk
-      for await (const chunk of response.textStream) {
-        await append(chunk);
-      }
+    // 5. Stream the response using AI SDK and return as streaming response
+    const response = streamText({
+      model: openai("gpt-4.1-mini"),
+      system: systemPrompt,
+      messages: [{ role: "user", content: "Please provide a hint to help me." }],
+      temperature: 0.7,
     });
 
-    // Add CORS headers to the streaming response
-    const newHeaders = new Headers(streamResponse.headers);
-    Object.entries(corsHeaders).forEach(([key, value]) => {
-      newHeaders.set(key, value);
-    });
-
-    return new Response(streamResponse.body, {
-      status: streamResponse.status,
-      statusText: streamResponse.statusText,
-      headers: newHeaders,
+    // Return the text stream directly as HTTP response
+    return response.toTextStreamResponse({
+      headers: corsHeaders,
     });
   }),
 });
