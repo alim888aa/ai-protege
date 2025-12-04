@@ -1,13 +1,22 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { PenTool, MessageCircle, Lightbulb, Navigation, ChevronRight, ChevronLeft, X } from 'lucide-react';
+import { useState, useEffect, useCallback, useMemo, type ComponentType } from 'react';
+import { PenTool, MessageCircle, Lightbulb, Navigation, ChevronRight, ChevronLeft, X, type LucideIcon } from 'lucide-react';
+
+interface Rect {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+  right: number;
+  bottom: number;
+}
 
 interface TourStep {
   target: string;
   title: string;
   description: string;
-  icon: React.ReactNode;
+  icon: LucideIcon;
   position: 'top' | 'bottom' | 'left' | 'right';
 }
 
@@ -16,35 +25,35 @@ const tourSteps: TourStep[] = [
     target: '.excalidraw .Island.App-toolbar',
     title: 'Drawing Tools',
     description: 'Use these tools to sketch diagrams, shapes, and visuals. Drawing helps organize your thoughts.',
-    icon: <PenTool className="w-5 h-5" />,
+    icon: PenTool,
     position: 'bottom',
   },
   {
     target: '[data-tour="input-panel"]',
     title: 'Text Explanation',
     description: 'Type your explanation here. Combine your drawing with written text to teach the concept clearly.',
-    icon: <MessageCircle className="w-5 h-5" />,
+    icon: MessageCircle,
     position: 'top',
   },
   {
     target: '[data-tour="message-panel"]',
     title: 'AI Student Chat',
     description: 'Your AI student will ask questions here. Read their questions and respond to help them understand.',
-    icon: <MessageCircle className="w-5 h-5" />,
+    icon: MessageCircle,
     position: 'left',
   },
   {
     target: '[data-tour="hint-button"]',
     title: 'Need Help?',
     description: 'Stuck? Click here for hints. You get 3 hints per concept to guide your thinking.',
-    icon: <Lightbulb className="w-5 h-5" />,
+    icon: Lightbulb,
     position: 'left',
   },
   {
     target: '[data-tour="navigation"]',
     title: 'Navigation',
     description: 'Move between concepts here. Complete at least one exchange with the AI before proceeding.',
-    icon: <Navigation className="w-5 h-5" />,
+    icon: Navigation,
     position: 'top',
   },
 ];
@@ -56,20 +65,42 @@ interface TeachingTourProps {
 
 export function TeachingTour({ topicName, onComplete }: TeachingTourProps) {
   const [currentStep, setCurrentStep] = useState(0);
-  const [highlightRect, setHighlightRect] = useState<DOMRect | null>(null);
+  const [highlightRect, setHighlightRect] = useState<Rect | null>(null);
 
   const updateHighlight = useCallback(() => {
     const step = tourSteps[currentStep];
     const element = document.querySelector(step.target);
     if (element) {
-      setHighlightRect(element.getBoundingClientRect());
+      const rect = element.getBoundingClientRect();
+      // Store plain object instead of DOMRect
+      setHighlightRect({
+        left: rect.left,
+        top: rect.top,
+        width: rect.width,
+        height: rect.height,
+        right: rect.right,
+        bottom: rect.bottom,
+      });
+    } else {
+      setHighlightRect(null);
     }
   }, [currentStep]);
 
   useEffect(() => {
-    updateHighlight();
-    window.addEventListener('resize', updateHighlight);
-    return () => window.removeEventListener('resize', updateHighlight);
+    // Delay initial highlight to ensure DOM is ready
+    const timer = setTimeout(updateHighlight, 100);
+    
+    // Single resize listener
+    const handleResize = () => {
+      updateHighlight();
+    };
+    
+    window.addEventListener('resize', handleResize);
+    
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('resize', handleResize);
+    };
   }, [updateHighlight]);
 
   const handleKeyDown = useCallback(
@@ -98,14 +129,22 @@ export function TeachingTour({ topicName, onComplete }: TeachingTourProps) {
 
   const step = tourSteps[currentStep];
   const isLastStep = currentStep === tourSteps.length - 1;
+  const Icon = step.icon;
 
-  // Calculate tooltip position with viewport clamping
-  const getTooltipStyle = (): React.CSSProperties => {
-    if (!highlightRect) return { opacity: 0 };
-
+  // Memoize tooltip position calculation
+  const tooltipStyle = useMemo((): React.CSSProperties => {
     const padding = 16;
     const tooltipWidth = 320;
     const tooltipHeight = 200;
+
+    // If no highlight rect, center the tooltip as fallback
+    if (!highlightRect) {
+      return {
+        left: '50%',
+        top: '50%',
+        transform: 'translate(-50%, -50%)',
+      };
+    }
 
     let left = 0;
     let top = 0;
@@ -134,10 +173,19 @@ export function TeachingTour({ topicName, onComplete }: TeachingTourProps) {
     top = Math.max(padding, Math.min(top, window.innerHeight - tooltipHeight - padding));
 
     return { left, top };
-  };
+  }, [highlightRect, step.position]);
 
   return (
     <div className="fixed inset-0 z-[100]">
+      {/* Skip button - always visible */}
+      <button
+        onClick={onComplete}
+        className="absolute top-4 right-4 z-[101] px-4 py-2 bg-white dark:bg-zinc-800 text-gray-700 dark:text-gray-200 rounded-lg shadow-lg hover:bg-gray-100 dark:hover:bg-zinc-700 transition-colors flex items-center gap-2"
+      >
+        <X className="w-4 h-4" />
+        Skip Tour
+      </button>
+
       {/* Backdrop with cutout */}
       <svg className="absolute inset-0 w-full h-full">
         <defs>
@@ -180,13 +228,13 @@ export function TeachingTour({ topicName, onComplete }: TeachingTourProps) {
 
       {/* Tooltip */}
       <div
-        className="absolute w-80 bg-white dark:bg-zinc-800 rounded-2xl shadow-2xl p-5 animate-in fade-in slide-in-from-bottom-2 duration-200"
-        style={getTooltipStyle()}
+        className="absolute w-80 bg-white dark:bg-zinc-800 rounded-2xl shadow-2xl p-5 transition-all duration-200"
+        style={tooltipStyle}
       >
         {/* Header */}
         <div className="flex items-center gap-3 mb-3">
           <div className="p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg text-indigo-600 dark:text-indigo-400">
-            {step.icon}
+            <Icon className="w-5 h-5" />
           </div>
           <div>
             <p className="text-xs text-gray-500 dark:text-gray-400">

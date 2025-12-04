@@ -25,13 +25,35 @@ export function TeachingWelcomeScreen({ topicName, onDismiss }: TeachingWelcomeS
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fadeIn"
       onClick={onDismiss}
     >
       <div
-        className="relative max-w-lg w-full mx-4 bg-white dark:bg-zinc-800 rounded-2xl shadow-2xl p-8 animate-in fade-in zoom-in-95 duration-200"
+        className="relative max-w-lg w-full mx-4 bg-white dark:bg-zinc-800 rounded-2xl shadow-2xl p-8 animate-scaleIn"
         onClick={(e) => e.stopPropagation()}
       >
+        <style jsx>{`
+          @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+          }
+          @keyframes scaleIn {
+            from { 
+              opacity: 0;
+              transform: scale(0.95);
+            }
+            to { 
+              opacity: 1;
+              transform: scale(1);
+            }
+          }
+          .animate-fadeIn {
+            animation: fadeIn 0.2s ease-out;
+          }
+          .animate-scaleIn {
+            animation: scaleIn 0.2s ease-out;
+          }
+        `}</style>
         {/* Header */}
         <div className="flex flex-col items-center gap-3 mb-6">
           <div className="p-3 bg-indigo-100 dark:bg-indigo-900/30 rounded-full">
