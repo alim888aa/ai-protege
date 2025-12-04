@@ -47,6 +47,9 @@ export function TeachingClient({ sessionId, conceptIndex }: TeachingClientProps)
     );
   }
 
+  // Determine if session has source material (not "none" type)
+  const hasSourceMaterial = session.sourceType !== 'none' && session.sourceType !== undefined;
+
   return (
     <TeachingLayout
       sessionId={sessionId}
@@ -55,6 +58,7 @@ export function TeachingClient({ sessionId, conceptIndex }: TeachingClientProps)
       totalConcepts={totalConcepts}
       currentDialogue={currentDialogue}
       currentExplanation={currentExplanation}
+      hasSourceMaterial={hasSourceMaterial}
     />
   );
 }

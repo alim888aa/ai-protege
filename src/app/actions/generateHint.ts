@@ -42,6 +42,15 @@ export async function generateHint(
         .join('\n')
     : 'No dialogue yet - the teacher is just starting to explain.';
 
+  // Get the last AI response if available
+  const lastAIResponse = currentDialogue.length > 0
+    ? [...currentDialogue].reverse().find((msg) => msg.role === 'assistant')
+    : null;
+  
+  const lastAIContext = lastAIResponse
+    ? `\nLAST AI STUDENT RESPONSE:\n"${lastAIResponse.content}"\n\nIMPORTANT: The hint should help the teacher address what the AI student just said or asked above.`
+    : '';
+
   // Construct hint prompt based on hint count and whether source material exists
   let hintPrompt: string;
 
@@ -57,18 +66,21 @@ ${userExplanation || 'No explanation written yet.'}
 
 CURRENT DIALOGUE:
 ${dialogueHistory}
+${lastAIContext}
 
 The teacher seems stuck and needs a gentle hint. Using your general knowledge about "${concept.title}", provide a leading clue that:
 1. Doesn't give away the full answer
 2. Guides them toward the right direction
 3. Uses simple, encouraging language
 4. Helps them think about what to explain next
-5. Does NOT end with a question - make it a statement or suggestion
+5. If the AI student asked a question, help the teacher think about how to answer it
+6. Do NOT end with a question - make it a statement or suggestion
 
 Example hints:
 - "Think about how you would explain this to someone who has never heard of it before."
 - "Consider starting with the main purpose or goal of this concept."
 - "A simple example from everyday life could help make this clearer."
+- "The AI student is curious about [topic] - think about a simple way to explain that."
 
 Start your hint with "Hint 1 of 3: " and then provide the hint. Do not end with a question.
 
@@ -83,18 +95,21 @@ ${userExplanation || 'No explanation written yet.'}
 
 CURRENT DIALOGUE:
 ${dialogueHistory}
+${lastAIContext}
 
 The teacher has requested a second hint. Using your general knowledge about "${concept.title}", provide a more specific clue that:
 1. Points to a specific aspect they should cover
 2. Suggests an important detail or relationship they might be missing
 3. Helps them understand what's missing from their explanation
-4. Still encourages them to think it through
-5. Does NOT end with a question - make it a statement or suggestion
+4. If the AI student asked a specific question, guide the teacher toward answering it
+5. Still encourages them to think it through
+6. Do NOT end with a question - make it a statement or suggestion
 
 Example hints:
 - "Think about the relationship between [concept A] and [concept B]."
 - "The key part to explain is what happens when [specific condition]."
 - "Consider explaining [important aspect] - it's an important piece of the puzzle."
+- "To address what the AI student asked, think about [specific aspect]."
 
 Start your hint with "Hint 2 of 3: " and then provide the hint. Do not end with a question.
 
@@ -109,18 +124,21 @@ ${userExplanation || 'No explanation written yet.'}
 
 CURRENT DIALOGUE:
 ${dialogueHistory}
+${lastAIContext}
 
 The teacher has requested a third hint. Using your general knowledge about "${concept.title}", provide them with helpful guidance on what they might be missing.
 
 Your task:
 1. Analyze what the user has explained so far
 2. Based on your general knowledge, identify key aspects they haven't covered
-3. Provide a helpful summary of important points to consider
-4. Present it as: "Hint 3 of 3: Here are some key aspects you might want to cover: [your suggestions]"
+3. If the AI student asked a question, provide guidance on how to answer it
+4. Provide a helpful summary of important points to consider
+5. Present it as: "Hint 3 of 3: Here are some key aspects you might want to cover: [your suggestions]"
 
 Guidelines:
 - Use your general knowledge to suggest important aspects of the topic
 - Focus on what seems to be missing from their explanation
+- If there's an unanswered AI question, prioritize helping address that
 - Use simple, clear language (remember, they're teaching a 12-year-old)
 - Be specific and actionable
 - Keep it encouraging and supportive
@@ -142,18 +160,21 @@ ${userExplanation || 'No explanation written yet.'}
 
 CURRENT DIALOGUE:
 ${dialogueHistory}
+${lastAIContext}
 
 The teacher seems stuck and needs a gentle hint. Provide a leading clue that:
 1. Doesn't give away the full answer
 2. Guides them toward the right direction
 3. Uses simple, encouraging language
 4. Helps them think about what to explain next
-5. Does NOT end with a question - make it a statement or suggestion
+5. If the AI student asked a question, help the teacher think about how to answer it
+6. Does NOT end with a question - make it a statement or suggestion
 
 Example hints:
 - "Think about how you would explain this to someone who has never heard of it before."
 - "Consider starting with the main purpose or goal of this concept."
 - "A simple example from everyday life could help make this clearer."
+- "The AI student is curious about [topic] - the source material has some info on that."
 
 Start your hint with "Hint 1 of 3: " and then provide the hint. Do not end with a question.
 
@@ -172,18 +193,21 @@ ${userExplanation || 'No explanation written yet.'}
 
 CURRENT DIALOGUE:
 ${dialogueHistory}
+${lastAIContext}
 
 The teacher has requested a second hint. Provide a more specific clue that:
 1. Points to a specific aspect they should cover
 2. References something from the source material (without quoting directly)
 3. Helps them understand what's missing from their explanation
-4. Still encourages them to think it through
-5. Does NOT end with a question - make it a statement or suggestion
+4. If the AI student asked a specific question, guide the teacher toward answering it using the source material
+5. Still encourages them to think it through
+6. Does NOT end with a question - make it a statement or suggestion
 
 Example hints:
 - "The source material mentions something important about [specific aspect] that would be worth covering."
 - "Think about the relationship between [concept A] and [concept B]."
 - "The key part to explain is what happens when [specific condition]."
+- "To address the AI student's question, look at what the source says about [topic]."
 
 Start your hint with "Hint 2 of 3: " and then provide the hint. Do not end with a question.
 
@@ -202,6 +226,7 @@ ${userExplanation || 'No explanation written yet.'}
 
 CURRENT DIALOGUE:
 ${dialogueHistory}
+${lastAIContext}
 
 The teacher has requested a third hint. At this point, provide them with a synthesized summary of what they're missing.
 
@@ -209,12 +234,14 @@ Your task:
 1. Analyze what the user has explained so far
 2. Compare it to the source material
 3. Identify the key information they're missing or haven't covered
-4. Synthesize the relevant parts of the source material into a clear, helpful explanation
-5. Present it as: "Hint 3 of 3: Based on the source material, here's what you might be missing: [your synthesized explanation]"
+4. If the AI student asked a question, prioritize helping answer that question
+5. Synthesize the relevant parts of the source material into a clear, helpful explanation
+6. Present it as: "Hint 3 of 3: Based on the source material, here's what you might be missing: [your synthesized explanation]"
 
 Guidelines:
 - Don't just quote the source chunks - synthesize and format them into coherent information
 - Focus on what's missing from their explanation
+- If there's an unanswered AI question, prioritize helping address that with source material
 - Use simple, clear language (remember, they're teaching a 12-year-old)
 - You can reference concepts from the source without showing raw text
 - Be specific and actionable

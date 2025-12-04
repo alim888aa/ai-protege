@@ -46,6 +46,7 @@ interface TeachingLayoutProps {
   totalConcepts: number;
   currentDialogue?: Dialogue;
   currentExplanation?: Explanation;
+  hasSourceMaterial: boolean;
 }
 
 export function TeachingLayout({
@@ -55,6 +56,7 @@ export function TeachingLayout({
   totalConcepts,
   currentDialogue,
   currentExplanation,
+  hasSourceMaterial,
 }: TeachingLayoutProps) {
   const theme = useSystemTheme();
   const { state, actions } = useTeachingReducer();
@@ -120,6 +122,7 @@ export function TeachingLayout({
     currentConcept,
     canvasElementsRef,
     dialogueMessages,
+    hasSourceMaterial,
     state,
     actions,
   });

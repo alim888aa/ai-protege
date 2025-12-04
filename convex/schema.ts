@@ -2,6 +2,18 @@ import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
 export default defineSchema({
+  // Maps session-concept pairs to Agent component thread IDs
+  // This allows us to use proper Agent threads for streaming
+  threadMappings: defineTable({
+    sessionId: v.string(),
+    conceptId: v.string(),
+    threadId: v.string(), // Agent component thread ID
+    threadType: v.union(v.literal("chat"), v.literal("hint")),
+    createdAt: v.number(),
+  })
+    .index("by_session_concept_type", ["sessionId", "conceptId", "threadType"])
+    .index("by_thread", ["threadId"]),
+
   sourceMaterial: defineTable({
     userId: v.optional(v.string()), // Clerk user ID - optional for backwards compatibility
     sessionId: v.string(),

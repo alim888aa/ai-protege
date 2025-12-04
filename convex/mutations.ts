@@ -477,3 +477,103 @@ export const deleteSession = mutation({
     return { success: true };
   },
 });
+
+
+// ============================================
+// Thread Mapping Mutations & Queries
+// ============================================
+
+/**
+ * Gets or creates an Agent thread for a session-concept pair.
+ * This ensures we use proper Agent component thread IDs for streaming.
+ */
+export const getOrCreateThread = mutation({
+  args: {
+    sessionId: v.string(),
+    conceptId: v.string(),
+    threadType: v.union(v.literal("chat"), v.literal("hint")),
+  },
+  handler: async (ctx, args) => {
+    // Check if mapping already exists
+    const existing = await ctx.db
+      .query("threadMappings")
+      .withIndex("by_session_concept_type", (q) =>
+        q
+          .eq("sessionId", args.sessionId)
+          .eq("conceptId", args.conceptId)
+          .eq("threadType", args.threadType)
+      )
+      .first();
+
+    if (existing) {
+      return { threadId: existing.threadId, isNew: false };
+    }
+
+    // Create new thread in Agent component
+    // We'll do this in the action since createThread requires ActionCtx
+    // For now, just return null to signal we need to create one
+    return { threadId: null, isNew: true };
+  },
+});
+
+/**
+ * Saves a thread mapping after creating a thread in the Agent component.
+ */
+export const saveThreadMapping = mutation({
+  args: {
+    sessionId: v.string(),
+    conceptId: v.string(),
+    threadType: v.union(v.literal("chat"), v.literal("hint")),
+    threadId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    // Check if mapping already exists (race condition protection)
+    const existing = await ctx.db
+      .query("threadMappings")
+      .withIndex("by_session_concept_type", (q) =>
+        q
+          .eq("sessionId", args.sessionId)
+          .eq("conceptId", args.conceptId)
+          .eq("threadType", args.threadType)
+      )
+      .first();
+
+    if (existing) {
+      return { threadId: existing.threadId };
+    }
+
+    await ctx.db.insert("threadMappings", {
+      sessionId: args.sessionId,
+      conceptId: args.conceptId,
+      threadType: args.threadType,
+      threadId: args.threadId,
+      createdAt: Date.now(),
+    });
+
+    return { threadId: args.threadId };
+  },
+});
+
+/**
+ * Gets the thread ID for a session-concept pair (query version for client use).
+ */
+export const getThreadMapping = query({
+  args: {
+    sessionId: v.string(),
+    conceptId: v.string(),
+    threadType: v.union(v.literal("chat"), v.literal("hint")),
+  },
+  handler: async (ctx, args) => {
+    const mapping = await ctx.db
+      .query("threadMappings")
+      .withIndex("by_session_concept_type", (q) =>
+        q
+          .eq("sessionId", args.sessionId)
+          .eq("conceptId", args.conceptId)
+          .eq("threadType", args.threadType)
+      )
+      .first();
+
+    return mapping?.threadId ?? null;
+  },
+});

@@ -31,11 +31,14 @@ export function MessagePanel({
   const prevMessageCountRef = useRef(messages.length);
   const [size, setSize] = useState({ width: 350, height: 400 });
 
+  // Use streamingContent prop directly (works for both Vercel API streaming and Convex final result)
+  const displayStreamingContent = streamingContent;
+
   useEffect(() => {
     if (scrollRef.current && !isCollapsed) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages.length, streamingContent, isCollapsed]);
+  }, [messages.length, displayStreamingContent, isCollapsed]);
 
   useEffect(() => {
     if (isCollapsed && messages.length > prevMessageCountRef.current) {
@@ -128,8 +131,12 @@ export function MessagePanel({
                   fontSize={Math.max(11, Math.min(16, size.width / 28))}
                 />
               ))}
-              {isStreaming && streamingContent && (
-                <StreamingBubble content={streamingContent} fontSize={Math.max(11, Math.min(16, size.width / 28))} />
+              {isStreaming && (
+                displayStreamingContent ? (
+                  <StreamingBubble content={displayStreamingContent} fontSize={Math.max(11, Math.min(16, size.width / 28))} />
+                ) : (
+                  <ThinkingBubble fontSize={Math.max(11, Math.min(16, size.width / 28))} />
+                )
               )}
             </>
           )}
@@ -168,6 +175,24 @@ function StreamingBubble({ content, fontSize }: { content: string; fontSize: num
         {content}
         <span className="inline-block w-1 h-3 ml-0.5 bg-blue-500 animate-pulse" />
       </p>
+    </div>
+  );
+}
+
+function ThinkingBubble({ fontSize }: { fontSize: number }) {
+  return (
+    <div className="p-2 rounded-lg bg-gray-100 dark:bg-zinc-700 mr-4">
+      <span className="font-medium text-green-600 dark:text-green-400" style={{ fontSize: fontSize * 0.75 }}>
+        AI
+      </span>
+      <div className="flex items-center gap-1 mt-1" style={{ fontSize }}>
+        <span className="text-gray-500 dark:text-gray-400 italic">Thinking</span>
+        <span className="flex gap-0.5">
+          <span className="w-1.5 h-1.5 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+          <span className="w-1.5 h-1.5 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+          <span className="w-1.5 h-1.5 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+        </span>
+      </div>
     </div>
   );
 }
