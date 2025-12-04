@@ -93,6 +93,7 @@ export function MessagePanel({
       <div
         className="bg-white dark:bg-zinc-800 rounded-lg shadow-lg border border-gray-200 dark:border-zinc-700 flex flex-col"
         style={{ width: size.width, height: size.height }}
+        data-tour="message-panel"
       >
         {/* Resize handle - bottom left */}
         <div className="absolute bottom-0 left-0 w-4 h-4 cursor-sw-resize z-10" onMouseDown={handleResize}>

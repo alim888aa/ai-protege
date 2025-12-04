@@ -52,6 +52,7 @@ export function HintButton({ onClick, hintCount, isGenerating }: HintButtonProps
       className="absolute top-[420px] right-4 cursor-grab active:cursor-grabbing"
       style={{ transform: `translate(${position.x}px, ${position.y}px)` }}
       onMouseDown={handleMouseDown}
+      data-tour="hint-button"
     >
       <button
         onClick={handleClick}

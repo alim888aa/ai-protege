@@ -133,8 +133,8 @@
 3. Verify hint references source material
 4. Test hint in manual session → verify Vercel fallback works
 
-**Notes:**
-Couldn't get Delta streaming to work so we just stream the AI response after it's completed in Convex. Phase 4 testing is done, there's no point in checking time to first token since there is no streaming. Likely cause, GPT-4.1-
+**Notes from developer:**
+Switched to just http. Took out convex agent. Streaming works. 
 ## Phase 4: Testing & Cleanup
 
 - [ ] 4.1 End-to-end testing with source material

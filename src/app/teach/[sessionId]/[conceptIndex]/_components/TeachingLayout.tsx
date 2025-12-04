@@ -12,7 +12,7 @@ import { HintButton } from './HintButton';
 import { HintModal } from './HintModal';
 import { ErrorBanner } from './ErrorBanner';
 import { OutOfBoundsWarning } from './OutOfBoundsWarning';
-import { TeachingWelcomeScreen } from './TeachingWelcomeScreen';
+import { TeachingTour } from './TeachingTour';
 import { calculateTopicPosition, createBoundaryElement, defaultTopicAreaConfig } from '@/app/utils/topicAreaManager';
 import { useTeachingReducer, Message } from './useTeachingReducer';
 import { useCanvasHandlers, useDialogueHandlers, useNavigationHandlers } from './hooks';
@@ -62,19 +62,26 @@ export function TeachingLayout({
   const { state, actions } = useTeachingReducer();
   const { resetTimer } = useInactivityTimer(30000);
 
-  // Show welcome screen only on first topic of each session
+  // Show welcome screen only for brand new sessions (no existing dialogue or explanation)
   const welcomeKey = `teaching-welcome-${sessionId}`;
   const [showWelcome, setShowWelcome] = useState(false);
 
+  // Check if this is a truly new lesson (no existing progress)
+  const isNewLesson = useMemo(() => {
+    const hasExistingDialogue = currentDialogue?.messages && currentDialogue.messages.length > 0;
+    const hasExistingExplanation = currentExplanation?.textExplanation || currentExplanation?.canvasData;
+    return !hasExistingDialogue && !hasExistingExplanation;
+  }, [currentDialogue?.messages, currentExplanation?.textExplanation, currentExplanation?.canvasData]);
+
   useEffect(() => {
-    // Only show on first topic and if not dismissed for this session
-    if (conceptIndex === 0) {
+    // Only show on first topic, if it's a new lesson, and if not dismissed for this session
+    if (conceptIndex === 0 && isNewLesson) {
       const dismissed = sessionStorage.getItem(welcomeKey);
       if (!dismissed) {
         setShowWelcome(true);
       }
     }
-  }, [conceptIndex, welcomeKey]);
+  }, [conceptIndex, welcomeKey, isNewLesson]);
 
   const handleDismissWelcome = () => {
     setShowWelcome(false);
@@ -175,7 +182,7 @@ export function TeachingLayout({
   return (
     <div className="relative w-screen h-screen overflow-hidden bg-gray-50 dark:bg-zinc-900">
       {/* Canvas */}
-      <div className="absolute inset-0 z-0">
+      <div className="absolute inset-0 z-0" data-tour="canvas">
         <ExcalidrawWrapper
           initialElements={initialElements}
           initialAppState={initialAppState}
@@ -229,11 +236,11 @@ export function TeachingLayout({
       <ErrorBanner error={state.error} onDismiss={() => actions.setError(null)} />
       <OutOfBoundsWarning isVisible={isOutOfBounds} onScrollBack={scrollToTopic} />
 
-      {/* Welcome Screen */}
+      {/* Interactive Tour */}
       {showWelcome && (
-        <TeachingWelcomeScreen
+        <TeachingTour
           topicName={currentConcept.title}
-          onDismiss={handleDismissWelcome}
+          onComplete={handleDismissWelcome}
         />
       )}
     </div>

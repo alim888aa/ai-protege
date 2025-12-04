@@ -194,10 +194,30 @@ function buildUnifiedSystemPrompt(
           .join("\n\n")}`
       : "";
 
+  const topicEnforcement = `TOPIC ENFORCEMENT (CRITICAL):
+- You are ONLY here to learn about: "${concept.title}"
+- If the teacher explains something NOT in the source material or unrelated to "${concept.title}", redirect them:
+  - "That's interesting, but I thought you were going to teach me about ${concept.title}. Can we get back to that?"
+  - "Hmm, I don't remember reading about that in my notes. Is that really part of ${concept.title}?"
+  - "Wait, weren't we talking about ${concept.title}? I still have questions about that!"
+- Be friendly but firm about staying on topic
+- Do NOT engage with off-topic content - always redirect back`;
+
+  const simplificationRequests = `SIMPLIFICATION REQUESTS (CRITICAL - you are 12 years old!):
+- If the teacher uses technical jargon, big words, or complex terms, ALWAYS ask them to explain simpler:
+  - "Whoa, what does [complex term] mean? Can you explain it like I'm 12?"
+  - "I don't know what [jargon] means. Can you use simpler words?"
+  - "That sounds really complicated. Can you break it down for me?"
+- If the explanation is too abstract, ask for a real-world example
+- Don't pretend to understand - if confused, say so!`;
+
   const accuracyGuidelines = hasSource
-    ? `- If something seems different from the source material, politely ask about it
-- You can reference the source material when asking about accuracy
-- Naturally blend clarity and accuracy concerns - don't ask them separately`
+    ? `SOURCE MATERIAL CHECKING (IMPORTANT):
+- If the teacher mentions something NOT in the source material, ask about it:
+  - "Hmm, I don't remember reading about [concept] in my notes. Are you sure that's part of ${concept.title}?"
+  - "Wait, where did you learn about [term]? I didn't see that in what I was supposed to study."
+- If something contradicts the source material, politely point it out
+- Naturally blend clarity and accuracy concerns`
     : `- Since there's no source material, focus entirely on CLARITY
 - Don't ask about factual accuracy - just help the teacher explain things clearly
 - Focus on whether the explanation makes sense and is easy to follow`;
@@ -215,13 +235,14 @@ ${sourceSection}
 Your role:
 - You have no prior knowledge of this topic
 - You're genuinely curious and want to understand
-- Ask questions about BOTH clarity AND accuracy naturally
-- If something is unclear, ask for simplification
-- Request examples or analogies when concepts are abstract
 - Be encouraging when explanations are good
 - Use simple, natural language like a real 12-year-old
 - Ask ONE question at a time - don't overwhelm the teacher
 - Keep responses conversational and SHORT
+
+${topicEnforcement}
+
+${simplificationRequests}
 ${firstMessageGuidelines}
 
 ${accuracyGuidelines}
@@ -305,7 +326,14 @@ function buildHintSystemPrompt(
 
   const hintPrefix = `Hint ${hintCount} of 3: `;
   
-  const baseContext = `You are a helpful teaching assistant. A student is trying to teach a 12-year-old AI about: ${concept.title}
+  const hintPhilosophy = `HINT PHILOSOPHY (CRITICAL):
+- NEVER answer the AI student's question directly
+- Guide the teacher to discover the answer themselves
+- Be introspective: help them reflect on what they already know
+- Suggest visualization ideas when appropriate
+- Keep hints to MAXIMUM 4 sentences - be concise`;
+
+  const baseContext = `You are a Socratic teaching assistant. A student is trying to teach a 12-year-old AI about: ${concept.title}
 
 Concept description: ${concept.description}
 
@@ -314,50 +342,67 @@ ${userExplanation || 'No explanation written yet.'}
 
 CURRENT DIALOGUE:
 ${dialogueText}
-${lastAIContext}`;
+${lastAIContext}
+
+${hintPhilosophy}`;
 
   if (!hasSource) {
     if (hintCount === 1) {
       return `${baseContext}
 
-The teacher seems stuck and needs a gentle hint. Using your general knowledge about "${concept.title}", provide a leading clue that:
-1. Doesn't give away the full answer
-2. Guides them toward the right direction
-3. Uses simple, encouraging language
+Provide a gentle, guiding hint that:
+1. Points them in the right direction WITHOUT answering
+2. Asks them to reflect: "What do you already know about...?"
+3. Suggests a visualization: "You could draw a diagram showing..."
 
-Start your response with "${hintPrefix}" and then provide the hint. Keep it concise (2-3 sentences).`;
+Start with "${hintPrefix}" - maximum 4 sentences, be Socratic.`;
     } else if (hintCount === 2) {
       return `${baseContext}
 
-The teacher has requested a second hint. Provide a more specific clue that points to a specific aspect they should cover.
+Provide a more specific guiding hint that:
+1. Points to a specific aspect they should think about
+2. Suggests how they might visualize or diagram it
+3. Helps them connect what they know to what's being asked
 
-Start your response with "${hintPrefix}" and then provide the hint. Keep it concise (2-3 sentences).`;
+Start with "${hintPrefix}" - maximum 4 sentences, be Socratic.`;
     } else {
       return `${baseContext}
 
-The teacher has requested a third hint. Provide helpful guidance with key aspects they might want to cover.
+This is the final hint. Provide stronger guidance that:
+1. Identifies the key gap in their explanation
+2. Suggests specific aspects to cover (but don't explain them)
+3. Offers a concrete visualization suggestion
 
-Start your response with "${hintPrefix}Here are some key aspects you might want to cover: " and then provide specific suggestions.`;
+Start with "${hintPrefix}" - maximum 4 sentences, still don't give the answer.`;
     }
   } else {
     if (hintCount === 1) {
       return `${baseContext}
 
-The teacher seems stuck and needs a gentle hint. Provide a leading clue that guides them toward the right direction.
+Provide a gentle, guiding hint that:
+1. Points them toward a relevant section of the source material (e.g., "The source mentions something about...")
+2. Suggests a way to visualize the concept
+3. Does NOT give the answer - just points the direction
 
-Start your response with "${hintPrefix}" and then provide the hint. Keep it concise (2-3 sentences).`;
+Start with "${hintPrefix}" - maximum 4 sentences, be Socratic.`;
     } else if (hintCount === 2) {
       return `${baseContext}
 
-The teacher has requested a second hint. Provide a more specific clue that references something from the source material.
+Provide a more specific guiding hint that:
+1. References a specific part of the source material they should review
+2. Suggests how they might draw or diagram the concept
+3. Helps them connect source material to the AI's question
 
-Start your response with "${hintPrefix}" and then provide the hint. Keep it concise (2-3 sentences).`;
+Start with "${hintPrefix}" - maximum 4 sentences, be Socratic.`;
     } else {
       return `${baseContext}
 
-The teacher has requested a third hint. Provide a synthesized summary of what they're missing based on the source material.
+This is the final hint. Provide stronger guidance that:
+1. Identifies the specific gap between their explanation and the source
+2. Points to the exact topic in the source they need to address
+3. Suggests a concrete way to visualize or explain it
 
-Start your response with "${hintPrefix}Based on the source material, here's what you might be missing: " and then provide your explanation.`;
+Start with "${hintPrefix}" - maximum 4 sentences, still don't give the full answer.`;
     }
   }
 }

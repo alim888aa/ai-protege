@@ -25,7 +25,7 @@ export function NavigationBar({
   onBackToDashboard,
 }: NavigationBarProps) {
   return (
-    <div className="absolute bottom-4 right-4 flex items-center gap-4 bg-white dark:bg-zinc-800 rounded-lg shadow-lg border border-gray-200 dark:border-zinc-700 px-4 py-3 animate-fadeIn">
+    <div className="absolute bottom-4 right-4 flex items-center gap-4 bg-white dark:bg-zinc-800 rounded-lg shadow-lg border border-gray-200 dark:border-zinc-700 px-4 py-3 animate-fadeIn" data-tour="navigation">
       {/* Back to Dashboard */}
       <button
         onClick={onBackToDashboard}

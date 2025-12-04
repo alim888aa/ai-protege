@@ -61,6 +61,7 @@ export function InputPanel({
       <div
         className="bg-white dark:bg-zinc-800 rounded-lg shadow-lg border border-gray-200 dark:border-zinc-700 flex flex-col"
         style={{ width: size.width, height: size.height }}
+        data-tour="input-panel"
       >
         {/* Drag handle + resize */}
         <div className="drag-handle flex items-center justify-between h-7 bg-gray-100 dark:bg-zinc-700 rounded-t-lg cursor-grab active:cursor-grabbing border-b border-gray-200 dark:border-zinc-600 px-2">
