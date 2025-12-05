@@ -47,6 +47,11 @@ interface TeachingLayoutProps {
   currentDialogue?: Dialogue;
   currentExplanation?: Explanation;
   hasSourceMaterial: boolean;
+  // Full session data for caching on completion
+  topic: string;
+  concepts: Concept[];
+  dialogues: Dialogue[];
+  explanations: Explanation[];
 }
 
 export function TeachingLayout({
@@ -57,6 +62,10 @@ export function TeachingLayout({
   currentDialogue,
   currentExplanation,
   hasSourceMaterial,
+  topic,
+  concepts,
+  dialogues,
+  explanations,
 }: TeachingLayoutProps) {
   const theme = useSystemTheme();
   const { state, actions } = useTeachingReducer();
@@ -143,6 +152,10 @@ export function TeachingLayout({
     dialogueInput: state.dialogueInput,
     canvasElementsRef,
     excalidrawApiRef,
+    topic,
+    concepts,
+    dialogues,
+    explanations,
   });
 
   // Initial canvas state - filter out old boundaries and add fresh one with current dimensions

@@ -18,8 +18,40 @@ const summarySchema = z.object({
 
 export type SummaryResponse = z.infer<typeof summarySchema>;
 
+// Session data shape for direct generation
+export interface SessionDataForSummary {
+  topic: string;
+  concepts: Array<{
+    id: string;
+    title: string;
+    description: string;
+  }>;
+  dialogues: Array<{
+    conceptId: string;
+    messages: Array<{
+      role: string;
+      content: string;
+      timestamp: number;
+      type?: string;
+    }>;
+  }>;
+  explanations?: Array<{
+    conceptId: string;
+    textExplanation: string;
+    canvasData?: string;
+  }>;
+}
+
 /**
- * Generates a summary of what the AI student learned from all concept dialogues
+ * Generates a summary using provided session data (no Convex fetch)
+ */
+export async function generateSummaryFromData(data: SessionDataForSummary): Promise<SummaryResponse> {
+  const { topic, concepts, dialogues, explanations } = data;
+  return generateSummaryInternal(topic, concepts, dialogues, explanations);
+}
+
+/**
+ * Generates a summary by fetching session data from Convex
  * @param sessionId - The session ID to retrieve dialogues from
  * @returns Summary text with key concepts and analogies
  */
@@ -32,6 +64,18 @@ export async function generateSummary(sessionId: string): Promise<SummaryRespons
   }
 
   const { topic, concepts, dialogues, explanations } = session;
+  return generateSummaryInternal(topic, concepts, dialogues, explanations);
+}
+
+/**
+ * Internal function that generates the summary from data
+ */
+async function generateSummaryInternal(
+  topic: string,
+  concepts: SessionDataForSummary['concepts'],
+  dialogues: SessionDataForSummary['dialogues'],
+  explanations?: SessionDataForSummary['explanations']
+): Promise<SummaryResponse> {
 
   // Format all dialogues for the prompt
   const formattedDialogues = concepts.map((concept, index) => {

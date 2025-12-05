@@ -3,8 +3,9 @@
 import { useRouter } from 'next/navigation';
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '../../../../../convex/_generated/api';
-import { useState, useEffect, useCallback } from 'react';
-import { generateSummary, SummaryResponse } from '../../../actions/generateSummary';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { generateSummary, generateSummaryFromData, SummaryResponse } from '../../../actions/generateSummary';
+import { getCachedSessionData, clearSessionCache, CachedSessionData } from '../../../utils/sessionCache';
 import { LoadingState } from './LoadingState';
 import { ErrorState } from './ErrorState';
 import { CompletedState } from './CompletedState';
@@ -20,7 +21,18 @@ interface CompletionClientProps {
 export function CompletionClient({ sessionId }: CompletionClientProps) {
   const router = useRouter();
 
-  const session = useQuery(api.mutations.getSession, { sessionId });
+  // Try to get cached session data first (from navigation)
+  const cachedData = useRef<CachedSessionData | null>(null);
+  if (cachedData.current === null) {
+    cachedData.current = getCachedSessionData(sessionId);
+  }
+
+  // Only query Convex if no cached data (page refresh / direct URL access)
+  const session = useQuery(
+    api.mutations.getSession,
+    cachedData.current ? 'skip' : { sessionId }
+  );
+  
   const markCompleteMutation = useMutation(api.mutations.markComplete);
   const saveSummaryMutation = useMutation(api.mutations.saveSummary);
 
@@ -29,28 +41,77 @@ export function CompletionClient({ sessionId }: CompletionClientProps) {
   const [error, setError] = useState<string | null>(null);
   const [isExporting, setIsExporting] = useState<string | null>(null);
   const [exportError, setExportError] = useState<string | null>(null);
+  const [sessionTopic, setSessionTopic] = useState<string>('');
+  const [sessionExplanations, setSessionExplanations] = useState<CachedSessionData['explanations']>([]);
+  const hasFetchedRef = useRef(false);
 
-  const fetchSummary = useCallback(async () => {
-    if (!session) return;
-
-    // If summary already exists in session, use it (persist across refreshes)
-    if (session.summary) {
+  // Generate summary from cached data (fast path)
+  const generateFromCache = useCallback(async (data: CachedSessionData) => {
+    // If summary already exists in cache, use it
+    if (data.summary) {
       setSummary({
-        summary: session.summary.text,
-        keyConceptsCovered: session.summary.keyConceptsCovered,
-        analogiesUsed: session.summary.analogiesUsed,
+        summary: data.summary.text,
+        keyConceptsCovered: data.summary.keyConceptsCovered,
+        analogiesUsed: data.summary.analogiesUsed,
       });
-      setState(session.completed ? 'completed' : 'summary');
+      setSessionTopic(data.topic);
+      setSessionExplanations(data.explanations);
+      setState(data.completed ? 'completed' : 'summary');
       return;
     }
 
-    // Generate new summary
     try {
       setState('loading');
-      const result = await generateSummary(sessionId);
+      setSessionTopic(data.topic);
+      setSessionExplanations(data.explanations);
+      
+      // Generate summary using cached data (no Convex fetch needed)
+      const result = await generateSummaryFromData(data);
       setSummary(result);
       
       // Save summary to database for persistence
+      await saveSummaryMutation({
+        sessionId,
+        summary: {
+          text: result.summary,
+          keyConceptsCovered: result.keyConceptsCovered,
+          analogiesUsed: result.analogiesUsed,
+        },
+      });
+      
+      // Clear cache after successful save
+      clearSessionCache(sessionId);
+      setState('summary');
+    } catch (err) {
+      console.error('Failed to generate summary from cache:', err);
+      setError(err instanceof Error ? err.message : 'Failed to generate summary');
+      setState('error');
+    }
+  }, [sessionId, saveSummaryMutation]);
+
+  // Generate summary from Convex data (fallback path)
+  const generateFromConvex = useCallback(async (currentSession: NonNullable<typeof session>) => {
+    // If summary already exists in session, use it
+    if (currentSession.summary) {
+      setSummary({
+        summary: currentSession.summary.text,
+        keyConceptsCovered: currentSession.summary.keyConceptsCovered,
+        analogiesUsed: currentSession.summary.analogiesUsed,
+      });
+      setSessionTopic(currentSession.topic);
+      setSessionExplanations(currentSession.explanations ?? []);
+      setState(currentSession.completed ? 'completed' : 'summary');
+      return;
+    }
+
+    try {
+      setState('loading');
+      setSessionTopic(currentSession.topic);
+      setSessionExplanations(currentSession.explanations ?? []);
+      
+      const result = await generateSummary(sessionId);
+      setSummary(result);
+      
       await saveSummaryMutation({
         sessionId,
         summary: {
@@ -66,23 +127,34 @@ export function CompletionClient({ sessionId }: CompletionClientProps) {
       setError(err instanceof Error ? err.message : 'Failed to generate summary');
       setState('error');
     }
-  }, [session, sessionId, saveSummaryMutation]);
+  }, [sessionId, saveSummaryMutation]);
 
   useEffect(() => {
-    if (session && !summary && state === 'loading') {
-      fetchSummary();
+    if (hasFetchedRef.current) return;
+    
+    // Fast path: use cached data
+    if (cachedData.current) {
+      hasFetchedRef.current = true;
+      generateFromCache(cachedData.current);
+      return;
     }
-  }, [session, summary, state, fetchSummary]);
+    
+    // Fallback: wait for Convex data
+    if (session && state === 'loading') {
+      hasFetchedRef.current = true;
+      generateFromConvex(session);
+    }
+  }, [session, state, generateFromCache, generateFromConvex]);
 
   /**
    * Load all canvas elements from session explanations
    */
   const loadCanvasElements = useCallback((): TopicTaggedElement[] => {
-    if (!session?.explanations) return [];
+    if (sessionExplanations.length === 0) return [];
     
     const allElements: TopicTaggedElement[] = [];
     
-    for (const explanation of session.explanations) {
+    for (const explanation of sessionExplanations) {
       if (explanation.canvasData) {
         try {
           const parsed = JSON.parse(explanation.canvasData);
@@ -95,7 +167,7 @@ export function CompletionClient({ sessionId }: CompletionClientProps) {
     }
     
     return allElements;
-  }, [session]);
+  }, [sessionExplanations]);
 
   const handleExport = useCallback(async (type: 'excalidraw' | 'png') => {
     setIsExporting(type);
@@ -109,7 +181,7 @@ export function CompletionClient({ sessionId }: CompletionClientProps) {
         return;
       }
       
-      const filename = session?.topic || 'ai-protege-session';
+      const filename = sessionTopic || 'ai-protege-session';
       
       if (type === 'excalidraw') {
         const { exportToExcalidrawFile } = await import('../../../utils/sessionExport');
@@ -124,7 +196,7 @@ export function CompletionClient({ sessionId }: CompletionClientProps) {
     } finally {
       setIsExporting(null);
     }
-  }, [loadCanvasElements, session?.topic]);
+  }, [loadCanvasElements, sessionTopic]);
 
   const handleCorrect = async () => {
     try {
@@ -144,8 +216,8 @@ export function CompletionClient({ sessionId }: CompletionClientProps) {
     router.push('/dashboard');
   };
 
-  // Loading state
-  if (state === 'loading' || !session) {
+  // Loading state - show while waiting for data or generating summary
+  if (state === 'loading') {
     return <LoadingState />;
   }
 
@@ -158,7 +230,7 @@ export function CompletionClient({ sessionId }: CompletionClientProps) {
   if (state === 'completed') {
     return (
       <CompletedState
-        topic={session.topic}
+        topic={sessionTopic}
         summary={summary}
         isExporting={isExporting}
         exportError={exportError}
@@ -172,7 +244,7 @@ export function CompletionClient({ sessionId }: CompletionClientProps) {
   // Summary state
   return (
     <SummaryState
-      topic={session.topic}
+      topic={sessionTopic}
       summary={summary}
       isExporting={isExporting}
       exportError={exportError}

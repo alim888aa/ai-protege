@@ -14,6 +14,7 @@
     "@convex-dev/persistent-text-streaming": "^0.3.0",
     "@excalidraw/excalidraw": "^0.18.0",
     "@openrouter/ai-sdk-provider": "^1.2.3",
+    "@vercel/analytics": "^1.6.1",
     "ai": "^5.0.90",
     "convex": "^1.28.2",
     "convex-helpers": "^0.1.106",

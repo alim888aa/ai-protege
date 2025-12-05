@@ -6,6 +6,29 @@ import { useMutation } from 'convex/react';
 import { api } from '../../../../../../../convex/_generated/api';
 import { ExcalidrawAPI } from '@/app/components/ExcalidrawWrapper';
 import { calculateTopicPosition, createBoundaryElement } from '@/app/utils/topicAreaManager';
+import { cacheSessionData } from '@/app/utils/sessionCache';
+
+interface Concept {
+  id: string;
+  title: string;
+  description: string;
+}
+
+interface Dialogue {
+  conceptId: string;
+  messages: Array<{
+    role: string;
+    content: string;
+    timestamp: number;
+    type?: string;
+  }>;
+}
+
+interface Explanation {
+  conceptId: string;
+  textExplanation: string;
+  canvasData?: string;
+}
 
 interface UseNavigationHandlersProps {
   sessionId: string;
@@ -15,6 +38,11 @@ interface UseNavigationHandlersProps {
   dialogueInput: string;
   canvasElementsRef: MutableRefObject<readonly unknown[]>;
   excalidrawApiRef: MutableRefObject<ExcalidrawAPI | null>;
+  // Session data for caching
+  topic: string;
+  concepts: Concept[];
+  dialogues: Dialogue[];
+  explanations: Explanation[];
 }
 
 export function useNavigationHandlers({
@@ -25,6 +53,10 @@ export function useNavigationHandlers({
   dialogueInput,
   canvasElementsRef,
   excalidrawApiRef,
+  topic,
+  concepts,
+  dialogues,
+  explanations,
 }: UseNavigationHandlersProps) {
   const router = useRouter();
   const saveExplanation = useMutation(api.mutations.saveExplanation);
@@ -75,17 +107,42 @@ export function useNavigationHandlers({
   }, [router]);
 
   const handleCompleteSession = useCallback(async () => {
+    const currentCanvasData = JSON.stringify(canvasElementsRef.current);
+    
     try {
       await saveExplanation({
         sessionId,
         conceptId: currentConceptId,
         textExplanation: dialogueInput,
-        canvasData: JSON.stringify(canvasElementsRef.current),
+        canvasData: currentCanvasData,
       });
       await updateProgress({ sessionId, conceptIndex: conceptIndex + 1 });
     } catch (err) {
       console.error('Failed to save:', err);
     }
+
+    // Cache session data for fast completion page load
+    // Include the current explanation that was just saved
+    const updatedExplanations = [...explanations];
+    const existingIdx = updatedExplanations.findIndex(e => e.conceptId === currentConceptId);
+    const currentExplanation = {
+      conceptId: currentConceptId,
+      textExplanation: dialogueInput,
+      canvasData: currentCanvasData,
+    };
+    if (existingIdx >= 0) {
+      updatedExplanations[existingIdx] = currentExplanation;
+    } else {
+      updatedExplanations.push(currentExplanation);
+    }
+
+    cacheSessionData(sessionId, {
+      topic,
+      concepts,
+      dialogues,
+      explanations: updatedExplanations,
+    });
+
     router.push(`/complete/${sessionId}`);
   }, [
     sessionId,
@@ -96,6 +153,10 @@ export function useNavigationHandlers({
     saveExplanation,
     updateProgress,
     router,
+    topic,
+    concepts,
+    dialogues,
+    explanations,
   ]);
 
   return { handleNextTopic, handleBackToDashboard, handleCompleteSession };

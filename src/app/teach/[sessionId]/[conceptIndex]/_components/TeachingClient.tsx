@@ -59,6 +59,10 @@ export function TeachingClient({ sessionId, conceptIndex }: TeachingClientProps)
       currentDialogue={currentDialogue}
       currentExplanation={currentExplanation}
       hasSourceMaterial={hasSourceMaterial}
+      topic={session.topic}
+      concepts={session.concepts}
+      dialogues={session.dialogues}
+      explanations={session.explanations ?? []}
     />
   );
 }

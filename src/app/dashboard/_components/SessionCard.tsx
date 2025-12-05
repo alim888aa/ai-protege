@@ -84,6 +84,10 @@ export function SessionCard({ session, onDelete }: SessionCardProps) {
   const router = useRouter();
   const { sessionId, topic, sourceUrl, sourceType, concepts, currentConceptIndex, completed, updatedAt } = session;
   
+  // Session is effectively complete if marked complete OR all concepts have been covered
+  // (handles case where user navigates away from complete page without clicking "Looks correct!")
+  const isEffectivelyComplete = completed || currentConceptIndex >= concepts.length;
+  
   // Determine source display text
   const getSourceDisplay = () => {
     if (sourceType === 'pdf') {
@@ -97,7 +101,7 @@ export function SessionCard({ session, onDelete }: SessionCardProps) {
   const sourceDisplay = getSourceDisplay();
   
   // Determine progress display
-  const progressDisplay = completed 
+  const progressDisplay = isEffectivelyComplete 
     ? 'Complete ✓' 
     : `${currentConceptIndex}/${concepts.length} concepts`;
   
@@ -117,7 +121,7 @@ export function SessionCard({ session, onDelete }: SessionCardProps) {
       </p>
       
       {/* Progress */}
-      <p className={`text-sm mb-2 ${completed ? 'text-green-600 dark:text-green-400' : 'text-blue-600 dark:text-blue-400'}`}>
+      <p className={`text-sm mb-2 ${isEffectivelyComplete ? 'text-green-600 dark:text-green-400' : 'text-blue-600 dark:text-blue-400'}`}>
         {progressDisplay}
       </p>
       
@@ -128,7 +132,7 @@ export function SessionCard({ session, onDelete }: SessionCardProps) {
       
       {/* Action buttons row */}
       <div className="flex justify-between items-center">
-        {completed ? (
+        {isEffectivelyComplete ? (
           <button
             onClick={() => router.push(`/complete/${sessionId}`)}
             className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors"
