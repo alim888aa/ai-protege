@@ -1,36 +1,83 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AI Protégé
+
+Learn by teaching an AI student that asks questions and fact-checks you.
+
+**Live demo:** [ai-protege.xyz](https://ai-protege.xyz)
+
+## What is this?
+
+AI Protégé implements the Feynman Technique—the idea that if you can't explain something simply, you don't really understand it. Instead of passively consuming content, you actively teach an AI that acts like a curious 12-year-old student.
+
+Think of it as rubber duck debugging, but for learning anything.
+
+## How it works
+
+1. **Provide source material** - Drop in a URL or PDF
+2. **Extract concepts** - The app identifies key concepts to learn
+3. **Teach each concept** - Draw diagrams on a canvas and write explanations
+4. **Get challenged** - The AI asks questions and uses RAG to fact-check you against the source
+5. **See the summary** - The AI summarizes what it learned from your teaching
+
+The AI combines three inputs: your canvas drawing (vision), your text explanation, and relevant chunks from your source material (RAG). This ensures it can challenge both clarity and accuracy.
+
+## Tech Stack
+
+- **Next.js 15** - App Router
+- **Convex** - Real-time database + vector search for RAG
+- **Excalidraw** - Canvas for drawing diagrams
+- **OpenAI** - GPT for dialogue, embeddings for RAG
+- **Clerk** - Authentication
+- **Vercel** - Deployment
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
+- Node.js 18+
+- pnpm
+- Convex account
+- OpenAI API key
+- Clerk account
+
+### Installation
+
+1. Clone the repository
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/yourusername/ai-protege.git
+cd ai-protege
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies
+pnpm install
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3.Set up environment variables
+cp .env.example .env.local
+- Fill in your API keys:
+CONVEX_DEPLOYMENT=
+NEXT_PUBLIC_CONVEX_URL=
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
+CLERK_SECRET_KEY=
+OPENAI_API_KEY=
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. Start Convex
+npx convex dev
 
-## Learn More
+5. Start the development server
+pnpm dev
 
-To learn more about Next.js, take a look at the following resources:
+6. Open http://localhost:3000
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Project Structure
+├── src/app/                 # Next.js App Router pages
+│   ├── dashboard/           # Session management
+│   ├── teach/               # Teaching interface
+│   ├── review/              # Concept review
+│   ├── complete/            # Session completion
+│   └── actions/             # Server actions for AI
+├── convex/                  # Convex backend
+│   ├── actions/             # Scraping, RAG, PDF processing
+│   ├── utils/               # Chunking, similarity, jargon
+│   └── schema.ts            # Database schema
+└── .kiro/specs/             # Kiro spec documents
+Built with Kiro
+This project was built using Kiro's spec-driven development. The .kiro/specs/ folder contains the requirements, design docs, and implementation tasks that guided development.
