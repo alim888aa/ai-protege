@@ -13,7 +13,7 @@
     "@clerk/themes": "^2.4.41",
     "@convex-dev/persistent-text-streaming": "^0.3.0",
     "@excalidraw/excalidraw": "^0.18.0",
-    "@openrouter/ai-sdk-provider": "^1.2.3",
+    "@polar-sh/sdk": "^0.48.1",
     "@vercel/analytics": "^1.6.1",
     "ai": "^5.0.90",
     "convex": "^1.28.2",
@@ -23,11 +23,11 @@
     "next": "16.0.7",
     "react": "19.2.1",
     "react-dom": "19.2.1",
+    "standardwebhooks": "^1.0.0",
     "unpdf": "^1.4.0",
     "zod": "^4.1.12"
   },
   "devDependencies": {
-    "@ai-sdk/huggingface": "^0.0.9",
     "@ai-sdk/openai": "^2.0.65",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",

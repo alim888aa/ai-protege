@@ -1,9 +1,11 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '../../../../../convex/_generated/api';
-import { useState, useEffect } from 'react';
+import type { Doc } from '../../../../../convex/_generated/dataModel';
+import { useState } from 'react';
 import { ConceptCard } from './ConceptCard';
 import { DeleteConfirmModal } from './DeleteConfirmModal';
 import { ReviewLoadingSkeleton } from './ReviewLoadingSkeleton';
@@ -19,38 +21,77 @@ interface ConceptReviewClientProps {
 }
 
 export function ConceptReviewClient({ sessionId }: ConceptReviewClientProps) {
-  const router = useRouter();
-
   const sourceMaterial = useQuery(api.mutations.getSourceMaterialBySession, {
     sessionId,
   });
   const session = useQuery(api.mutations.getSession, { sessionId });
+
+  if (sourceMaterial === undefined || session === undefined) {
+    return <ReviewLoadingSkeleton />;
+  }
+
+  if (sourceMaterial === null) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-zinc-900 dark:to-zinc-800">
+        <div className="text-center">
+          <p className="mb-4 text-gray-600 dark:text-gray-400">Session not found.</p>
+          <Link
+            href="/"
+            className="rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white transition-colors hover:bg-blue-700"
+          >
+            Back to Setup
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <ConceptReviewEditor
+      key={sourceMaterial._id}
+      sessionId={sessionId}
+      sourceMaterial={sourceMaterial}
+      session={session}
+    />
+  );
+}
+
+interface ConceptReviewEditorProps {
+  sessionId: string;
+  sourceMaterial: Doc<'sourceMaterial'>;
+  session: Doc<'sessions'> | null;
+}
+
+function initialConcepts(
+  sourceMaterial: Doc<'sourceMaterial'>,
+  sessionId: string
+): Concept[] {
+  if (sourceMaterial.concepts?.length) {
+    return sourceMaterial.concepts;
+  }
+
+  if (sourceMaterial.sourceType === 'none' || !sourceMaterial.sourceType) {
+    return [{ id: `concept-${sessionId}`, title: '', description: '' }];
+  }
+
+  return [];
+}
+
+function ConceptReviewEditor({
+  sessionId,
+  sourceMaterial,
+  session,
+}: ConceptReviewEditorProps) {
+  const router = useRouter();
   const updateConceptsMutation = useMutation(api.mutations.updateConcepts);
   const createSessionMutation = useMutation(api.mutations.createSession);
 
-  const [concepts, setConcepts] = useState<Concept[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [concepts, setConcepts] = useState<Concept[]>(() =>
+    initialConcepts(sourceMaterial, sessionId)
+  );
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
-
-  // Initialize concepts from sourceMaterial or session
-  useEffect(() => {
-    if (sourceMaterial) {
-      const initialConcepts = sourceMaterial.concepts || [];
-      if (initialConcepts.length > 0) {
-        setConcepts(initialConcepts);
-      } else if (sourceMaterial.sourceType === 'none' || (!sourceMaterial.sourceType && !sourceMaterial.concepts?.length)) {
-        // For manual mode, start with one empty concept
-        setConcepts([{
-          id: `concept-${Date.now()}`,
-          title: '',
-          description: '',
-        }]);
-      }
-      setIsLoading(false);
-    }
-  }, [sourceMaterial]);
 
   const handleTitleChange = (id: string, newTitle: string) => {
     setConcepts(concepts.map(c => 
@@ -151,26 +192,6 @@ export function ConceptReviewClient({ sessionId }: ConceptReviewClientProps) {
       setIsSaving(false);
     }
   };
-
-  if (isLoading) {
-    return <ReviewLoadingSkeleton />;
-  }
-
-  if (!sourceMaterial) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-zinc-900 dark:to-zinc-800">
-        <div className="text-center">
-          <p className="text-gray-600 dark:text-gray-400 mb-4">Session not found.</p>
-          <button
-            onClick={() => router.push('/')}
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors"
-          >
-            Back to Setup
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   const isManualMode = sourceMaterial.sourceType === 'none' || !sourceMaterial.sourceType;
 

@@ -1,5 +1,10 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
+import {
+  requireOwnedSession,
+  requireOwnedSourceMaterial,
+  requirePaidAccess,
+} from "./access";
 
 /**
  * Creates a new source material entry in the database
@@ -28,10 +33,7 @@ export const createSourceMaterial = mutation({
     createdAt: v.number(),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-      throw new Error("Not authenticated");
-    }
+    const identity = await requirePaidAccess(ctx);
 
     await ctx.db.insert("sourceMaterial", {
       userId: identity.subject,
@@ -55,12 +57,7 @@ export const getSourceMaterialBySession = query({
     sessionId: v.string(),
   },
   handler: async (ctx, args) => {
-    const sourceMaterial = await ctx.db
-      .query("sourceMaterial")
-      .withIndex("by_session", (q) => q.eq("sessionId", args.sessionId))
-      .first();
-
-    return sourceMaterial;
+    return requireOwnedSourceMaterial(ctx, args.sessionId);
   },
 });
 
@@ -79,14 +76,7 @@ export const updateConceptsInSourceMaterial = mutation({
     ),
   },
   handler: async (ctx, args) => {
-    const sourceMaterial = await ctx.db
-      .query("sourceMaterial")
-      .withIndex("by_session", (q) => q.eq("sessionId", args.sessionId))
-      .first();
-
-    if (!sourceMaterial) {
-      throw new Error("Session not found");
-    }
+    const sourceMaterial = await requireOwnedSourceMaterial(ctx, args.sessionId);
 
     await ctx.db.patch(sourceMaterial._id, {
       concepts: args.concepts,
@@ -116,9 +106,22 @@ export const createSession = mutation({
     ),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-      throw new Error("Not authenticated");
+    const identity = await requirePaidAccess(ctx);
+    const sourceMaterial = await ctx.db
+      .query("sourceMaterial")
+      .withIndex("by_session", (q) => q.eq("sessionId", args.sessionId))
+      .unique();
+
+    if (!sourceMaterial || sourceMaterial.userId !== identity.subject) {
+      throw new Error("Not authorized to create this session");
+    }
+
+    const existingSession = await ctx.db
+      .query("sessions")
+      .withIndex("by_session_id", (q) => q.eq("sessionId", args.sessionId))
+      .first();
+    if (existingSession) {
+      throw new Error("Session already exists");
     }
 
     const now = Date.now();
@@ -126,9 +129,9 @@ export const createSession = mutation({
     await ctx.db.insert("sessions", {
       userId: identity.subject,
       sessionId: args.sessionId,
-      topic: args.topic,
-      sourceType: args.sourceType,
-      sourceUrl: args.sourceUrl,
+      topic: sourceMaterial.topic,
+      sourceType: sourceMaterial.sourceType,
+      sourceUrl: sourceMaterial.sourceUrl,
       concepts: args.concepts,
       currentConceptIndex: 0,
       dialogues: [],
@@ -156,14 +159,7 @@ export const updateConcepts = mutation({
     ),
   },
   handler: async (ctx, args) => {
-    const session = await ctx.db
-      .query("sessions")
-      .withIndex("by_session_id", (q) => q.eq("sessionId", args.sessionId))
-      .first();
-
-    if (!session) {
-      throw new Error("Session not found");
-    }
+    const session = await requireOwnedSession(ctx, args.sessionId);
 
     await ctx.db.patch(session._id, {
       concepts: args.concepts,
@@ -180,10 +176,15 @@ export const getSession = query({
     sessionId: v.string(),
   },
   handler: async (ctx, args) => {
+    const identity = await requirePaidAccess(ctx);
     const session = await ctx.db
       .query("sessions")
       .withIndex("by_session_id", (q) => q.eq("sessionId", args.sessionId))
-      .first();
+      .unique();
+
+    if (session && session.userId !== identity.subject) {
+      throw new Error("Not authorized to access this session");
+    }
 
     return session;
   },
@@ -206,14 +207,7 @@ export const saveDialogue = mutation({
     ),
   },
   handler: async (ctx, args) => {
-    const session = await ctx.db
-      .query("sessions")
-      .withIndex("by_session_id", (q) => q.eq("sessionId", args.sessionId))
-      .first();
-
-    if (!session) {
-      throw new Error("Session not found");
-    }
+    const session = await requireOwnedSession(ctx, args.sessionId);
 
     // Find existing dialogue for this concept
     const existingDialogueIndex = session.dialogues.findIndex(
@@ -255,14 +249,7 @@ export const updateProgress = mutation({
     conceptIndex: v.number(),
   },
   handler: async (ctx, args) => {
-    const session = await ctx.db
-      .query("sessions")
-      .withIndex("by_session_id", (q) => q.eq("sessionId", args.sessionId))
-      .first();
-
-    if (!session) {
-      throw new Error("Session not found");
-    }
+    const session = await requireOwnedSession(ctx, args.sessionId);
 
     await ctx.db.patch(session._id, {
       currentConceptIndex: args.conceptIndex,
@@ -279,14 +266,7 @@ export const markComplete = mutation({
     sessionId: v.string(),
   },
   handler: async (ctx, args) => {
-    const session = await ctx.db
-      .query("sessions")
-      .withIndex("by_session_id", (q) => q.eq("sessionId", args.sessionId))
-      .first();
-
-    if (!session) {
-      throw new Error("Session not found");
-    }
+    const session = await requireOwnedSession(ctx, args.sessionId);
 
     await ctx.db.patch(session._id, {
       completed: true,
@@ -306,14 +286,7 @@ export const saveExplanation = mutation({
     canvasData: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const session = await ctx.db
-      .query("sessions")
-      .withIndex("by_session_id", (q) => q.eq("sessionId", args.sessionId))
-      .first();
-
-    if (!session) {
-      throw new Error("Session not found");
-    }
+    const session = await requireOwnedSession(ctx, args.sessionId);
 
     // Find existing explanation for this concept
     const explanations = session.explanations || [];
@@ -359,10 +332,7 @@ export const createManualSourceMaterial = mutation({
     topic: v.string(),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-      throw new Error("Not authenticated");
-    }
+    const identity = await requirePaidAccess(ctx);
 
     await ctx.db.insert("sourceMaterial", {
       userId: identity.subject,
@@ -389,14 +359,7 @@ export const saveSummary = mutation({
     }),
   },
   handler: async (ctx, args) => {
-    const session = await ctx.db
-      .query("sessions")
-      .withIndex("by_session_id", (q) => q.eq("sessionId", args.sessionId))
-      .first();
-
-    if (!session) {
-      throw new Error("Session not found");
-    }
+    const session = await requireOwnedSession(ctx, args.sessionId);
 
     await ctx.db.patch(session._id, {
       summary: args.summary,
@@ -417,10 +380,7 @@ export const saveSummary = mutation({
  */
 export const getUserSessions = query({
   handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-      return [];
-    }
+    const identity = await requirePaidAccess(ctx);
 
     const sessions = await ctx.db
       .query("sessions")
@@ -441,25 +401,7 @@ export const deleteSession = mutation({
     sessionId: v.string(),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-      throw new Error("Not authenticated");
-    }
-
-    // Find the session
-    const session = await ctx.db
-      .query("sessions")
-      .withIndex("by_session_id", (q) => q.eq("sessionId", args.sessionId))
-      .first();
-
-    if (!session) {
-      throw new Error("Session not found");
-    }
-
-    // Verify ownership
-    if (session.userId !== identity.subject) {
-      throw new Error("Not authorized to delete this session");
-    }
+    const session = await requireOwnedSession(ctx, args.sessionId);
 
     // Delete associated source material
     const sourceMaterial = await ctx.db
@@ -467,7 +409,7 @@ export const deleteSession = mutation({
       .withIndex("by_session", (q) => q.eq("sessionId", args.sessionId))
       .first();
 
-    if (sourceMaterial) {
+    if (sourceMaterial && sourceMaterial.userId === session.userId) {
       await ctx.db.delete(sourceMaterial._id);
     }
 
@@ -494,6 +436,7 @@ export const getOrCreateThread = mutation({
     threadType: v.union(v.literal("chat"), v.literal("hint")),
   },
   handler: async (ctx, args) => {
+    await requireOwnedSession(ctx, args.sessionId);
     // Check if mapping already exists
     const existing = await ctx.db
       .query("threadMappings")
@@ -527,6 +470,7 @@ export const saveThreadMapping = mutation({
     threadId: v.string(),
   },
   handler: async (ctx, args) => {
+    await requireOwnedSession(ctx, args.sessionId);
     // Check if mapping already exists (race condition protection)
     const existing = await ctx.db
       .query("threadMappings")
@@ -564,6 +508,7 @@ export const getThreadMapping = query({
     threadType: v.union(v.literal("chat"), v.literal("hint")),
   },
   handler: async (ctx, args) => {
+    await requireOwnedSession(ctx, args.sessionId);
     const mapping = await ctx.db
       .query("threadMappings")
       .withIndex("by_session_concept_type", (q) =>

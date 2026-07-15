@@ -1,7 +1,6 @@
 'use client';
 
-import { useMemo, useState, useEffect } from 'react';
-import { useInactivityTimer } from '@/app/hooks/useInactivityTimer';
+import { useState, useSyncExternalStore } from 'react';
 import { useSystemTheme } from '@/app/hooks/useSystemTheme';
 import { ExcalidrawWrapper } from '@/app/components/ExcalidrawWrapper';
 import { OverlayContainer } from './OverlayContainer';
@@ -46,13 +45,14 @@ interface TeachingLayoutProps {
   totalConcepts: number;
   currentDialogue?: Dialogue;
   currentExplanation?: Explanation;
-  hasSourceMaterial: boolean;
   // Full session data for caching on completion
   topic: string;
   concepts: Concept[];
   dialogues: Dialogue[];
   explanations: Explanation[];
 }
+
+const subscribeToWelcomeState = () => () => undefined;
 
 export function TeachingLayout({
   sessionId,
@@ -61,7 +61,6 @@ export function TeachingLayout({
   totalConcepts,
   currentDialogue,
   currentExplanation,
-  hasSourceMaterial,
   topic,
   concepts,
   dialogues,
@@ -69,31 +68,29 @@ export function TeachingLayout({
 }: TeachingLayoutProps) {
   const theme = useSystemTheme();
   const { state, actions } = useTeachingReducer();
-  const { resetTimer } = useInactivityTimer(30000);
 
   // Show welcome screen only for brand new sessions (no existing dialogue or explanation)
   const welcomeKey = `teaching-welcome-${sessionId}`;
-  const [showWelcome, setShowWelcome] = useState(false);
+  const [welcomeDismissed, setWelcomeDismissed] = useState(false);
 
   // Check if this is a truly new lesson (no existing progress)
-  const isNewLesson = useMemo(() => {
-    const hasExistingDialogue = currentDialogue?.messages && currentDialogue.messages.length > 0;
-    const hasExistingExplanation = currentExplanation?.textExplanation || currentExplanation?.canvasData;
-    return !hasExistingDialogue && !hasExistingExplanation;
-  }, [currentDialogue?.messages, currentExplanation?.textExplanation, currentExplanation?.canvasData]);
-
-  useEffect(() => {
-    // Only show on first topic, if it's a new lesson, and if not dismissed for this session
-    if (conceptIndex === 0 && isNewLesson) {
-      const dismissed = sessionStorage.getItem(welcomeKey);
-      if (!dismissed) {
-        setShowWelcome(true);
-      }
-    }
-  }, [conceptIndex, welcomeKey, isNewLesson]);
+  const hasExistingDialogue = Boolean(currentDialogue?.messages.length);
+  const hasExistingExplanation = Boolean(
+    currentExplanation?.textExplanation || currentExplanation?.canvasData
+  );
+  const isNewLesson = !hasExistingDialogue && !hasExistingExplanation;
+  const welcomeAvailable = useSyncExternalStore(
+    subscribeToWelcomeState,
+    () =>
+      conceptIndex === 0 &&
+      isNewLesson &&
+      sessionStorage.getItem(welcomeKey) === null,
+    () => false
+  );
+  const showWelcome = welcomeAvailable && !welcomeDismissed;
 
   const handleDismissWelcome = () => {
-    setShowWelcome(false);
+    setWelcomeDismissed(true);
     sessionStorage.setItem(welcomeKey, 'true');
   };
 
@@ -106,10 +103,10 @@ export function TeachingLayout({
     handleApiReady,
     handleScrollChange,
     scrollToTopic,
-  } = useCanvasHandlers(conceptIndex, resetTimer);
+  } = useCanvasHandlers(conceptIndex);
 
   // Messages from Convex + pending user message for optimistic UI
-  const dialogueMessages: Message[] = useMemo(() => {
+  const dialogueMessages: Message[] = (() => {
     const dbMessages = (currentDialogue?.messages ?? []).map((msg, idx) => ({
       id: `db-${msg.timestamp}-${idx}`,
       role: msg.role as 'user' | 'ai',
@@ -125,12 +122,12 @@ export function TeachingLayout({
           id: 'pending-user',
           role: 'user' as const,
           content: state.pendingUserMessage,
-          timestamp: Date.now(),
+          timestamp: currentDialogue?.messages.at(-1)?.timestamp ?? 0,
         },
       ];
     }
     return dbMessages;
-  }, [currentDialogue?.messages, state.pendingUserMessage]);
+  })();
 
   // Dialogue handlers
   const { handleSubmit, handleGenerateHint, handleHintClick } = useDialogueHandlers({
@@ -138,7 +135,6 @@ export function TeachingLayout({
     currentConcept,
     canvasElementsRef,
     dialogueMessages,
-    hasSourceMaterial,
     state,
     actions,
   });
@@ -159,7 +155,7 @@ export function TeachingLayout({
   });
 
   // Initial canvas state - filter out old boundaries and add fresh one with current dimensions
-  const initialElements = useMemo(() => {
+  const initialElements = (() => {
     const boundary = createBoundaryElement(conceptIndex, currentConcept.id);
     if (currentExplanation?.canvasData) {
       try {
@@ -172,9 +168,9 @@ export function TeachingLayout({
       }
     }
     return [boundary];
-  }, [conceptIndex, currentConcept.id, currentExplanation?.canvasData]);
+  })();
 
-  const initialAppState = useMemo(() => {
+  const initialAppState = (() => {
     const pos = calculateTopicPosition(conceptIndex);
     const { width, height } = defaultTopicAreaConfig;
     // Center the topic area in the viewport
@@ -188,7 +184,7 @@ export function TeachingLayout({
       scrollY: -(centerY - viewportHeight / 2),
       zoom: { value: 1 },
     };
-  }, [conceptIndex]);
+  })();
 
   const showMoveToNext = dialogueMessages.length >= 2;
 

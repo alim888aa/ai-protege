@@ -1,50 +1,54 @@
-import { Target, PenLine, MessageSquare } from 'lucide-react';
+import { BookOpenText, MessageSquareText, PenTool } from 'lucide-react';
+
+const steps = [
+  {
+    number: '01',
+    title: 'Bring something worth learning',
+    description: 'Choose a topic, add a PDF or URL, or begin with an idea you want to understand more deeply.',
+    icon: BookOpenText,
+  },
+  {
+    number: '02',
+    title: 'Make your thinking visible',
+    description: 'Draw the relationships and explain them in your own words, as if a curious student were listening.',
+    icon: PenTool,
+  },
+  {
+    number: '03',
+    title: 'Follow the confusion',
+    description: 'Answer the AI student’s questions until the idea becomes clear, connected, and genuinely yours.',
+    icon: MessageSquareText,
+  },
+];
 
 export function HowItWorksSection() {
   return (
-    <section className="max-w-6xl mx-auto px-6 pb-20">
-      <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 dark:text-white mb-4">
-        How It Works
-      </h2>
-      <p className="text-gray-600 dark:text-gray-400 text-center mb-12 max-w-xl mx-auto">
-        Three simple steps to master any concept
-      </p>
-      <div className="grid md:grid-cols-3 gap-8">
-        {/* Step 1 */}
-        <div className="bg-white dark:bg-zinc-800 rounded-2xl p-8 shadow-lg border border-gray-100 dark:border-zinc-700 hover:shadow-xl transition-shadow">
-          <div className="w-14 h-14 bg-blue-100 dark:bg-blue-900/40 rounded-xl flex items-center justify-center mb-6">
-            <Target className="w-7 h-7 text-blue-600 dark:text-blue-400" />
-          </div>
-          <div className="text-sm font-semibold text-blue-600 dark:text-blue-400 mb-2">Step 1</div>
-          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Pick Your Topic</h3>
-          <p className="text-gray-600 dark:text-gray-400">
-            Choose any concept you want to learn. Add a source URL, PDF, or start from scratch.
-          </p>
-        </div>
+    <section className="mx-auto w-full max-w-[1440px] px-5 py-24 md:px-8 md:py-32 lg:px-10">
+      <div className="grid gap-8 md:grid-cols-[0.75fr_1.25fr] md:items-end">
+        <p className="text-xs font-bold tracking-[0.18em] text-violet-300">THE FEYNMAN LOOP</p>
+        <h2 className="max-w-3xl text-4xl font-semibold leading-tight tracking-[-0.045em] text-white md:text-6xl">
+          Understanding starts where explaining gets difficult.
+        </h2>
+      </div>
 
-        {/* Step 2 */}
-        <div className="bg-white dark:bg-zinc-800 rounded-2xl p-8 shadow-lg border border-gray-100 dark:border-zinc-700 hover:shadow-xl transition-shadow">
-          <div className="w-14 h-14 bg-purple-100 dark:bg-purple-900/40 rounded-xl flex items-center justify-center mb-6">
-            <PenLine className="w-7 h-7 text-purple-600 dark:text-purple-400" />
-          </div>
-          <div className="text-sm font-semibold text-purple-600 dark:text-purple-400 mb-2">Step 2</div>
-          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Teach the AI</h3>
-          <p className="text-gray-600 dark:text-gray-400">
-            Draw diagrams and write explanations. Teach the concept as if explaining to a curious student.
-          </p>
-        </div>
+      <div className="mt-16 grid md:grid-cols-3">
+        {steps.map((step) => {
+          const Icon = step.icon;
 
-        {/* Step 3 */}
-        <div className="bg-white dark:bg-zinc-800 rounded-2xl p-8 shadow-lg border border-gray-100 dark:border-zinc-700 hover:shadow-xl transition-shadow">
-          <div className="w-14 h-14 bg-green-100 dark:bg-green-900/40 rounded-xl flex items-center justify-center mb-6">
-            <MessageSquare className="w-7 h-7 text-green-600 dark:text-green-400" />
-          </div>
-          <div className="text-sm font-semibold text-green-600 dark:text-green-400 mb-2">Step 3</div>
-          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Get Feedback</h3>
-          <p className="text-gray-600 dark:text-gray-400">
-            The AI asks clarifying questions and checks your understanding, helping you identify gaps.
-          </p>
-        </div>
+          return (
+            <article
+              key={step.number}
+              className="py-9 md:border-r md:border-white/10 md:px-8 md:py-10 md:first:pl-0 md:last:border-r-0 md:last:pr-0"
+            >
+              <div className="flex items-center justify-between">
+                <span className="font-mono text-sm text-zinc-500">{step.number}</span>
+                <Icon className="size-5 text-violet-300" />
+              </div>
+              <h3 className="mt-10 text-2xl font-semibold tracking-[-0.025em] text-white">{step.title}</h3>
+              <p className="mt-4 max-w-sm text-base leading-7 text-zinc-400">{step.description}</p>
+            </article>
+          );
+        })}
       </div>
     </section>
   );

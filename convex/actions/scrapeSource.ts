@@ -6,7 +6,7 @@ import { embed } from "ai";
 import { openai } from "@ai-sdk/openai";
 import { chunkText } from "../utils/chunking";
 import { extractJargon } from "../utils/jargon";
-import { api } from "../_generated/api";
+import { api, internal } from "../_generated/api";
 
 /**
  * Scrapes a URL, extracts readable content, chunks it, generates embeddings,
@@ -22,6 +22,7 @@ export const scrapeSource = action({
     sourceUrl: v.string(),
   },
   handler: async (ctx, args): Promise<{ sessionId: string; sourceText?: string; error?: string }> => {
+    await ctx.runQuery(internal.billing.requireEntitledUser, {});
     const { topic, sourceUrl } = args;
 
     try {
@@ -29,7 +30,7 @@ export const scrapeSource = action({
       let url: URL;
       try {
         url = new URL(sourceUrl);
-      } catch (e) {
+      } catch {
         return {
           sessionId: "",
           error: "Invalid URL format. Please provide a valid HTTP or HTTPS URL.",
@@ -72,17 +73,17 @@ export const scrapeSource = action({
           },
         });
         clearTimeout(timeoutId);
-      } catch (fetchError: any) {
+      } catch (fetchError: unknown) {
         clearTimeout(timeoutId);
-        if (fetchError.name === "AbortError") {
+        if (fetchError instanceof Error && fetchError.name === "AbortError") {
           return {
             sessionId: "",
-            error: "Request timed out. The URL took too long to respond. Please try again." + fetchError.message,
+            error: "Request timed out. The URL took too long to respond. Please try again.",
           };
         }
         return {
           sessionId: "",
-          error: "Unable to reach URL. Please check the link and try again." + fetchError.message,
+          error: "Unable to reach URL. Please check the link and try again.",
         };
       }
 
@@ -107,10 +108,10 @@ export const scrapeSource = action({
 
         // Remove script and style elements
         const scripts = document.querySelectorAll("script, style, noscript");
-        scripts.forEach((el: any) => el.remove());
+        scripts.forEach((element) => element.remove());
 
         // Try to find main content areas first
-        let contentElement =
+        const contentElement =
           document.querySelector("main") ||
           document.querySelector("article") ||
           document.querySelector('[role="main"]') ||
@@ -123,8 +124,6 @@ export const scrapeSource = action({
 
         // Clean up whitespace
         readableText = readableText.replace(/\s+/g, " ").trim();
-        console.log(readableText)
-
         if (readableText.length === 0) {
           return {
             sessionId: "",
@@ -136,11 +135,12 @@ export const scrapeSource = action({
         if (readableText.length > 50000) {
           readableText = readableText.substring(0, 50000);
         }
-      } catch (parseError: any) {
+      } catch (parseError: unknown) {
         console.error("Parse error details:", parseError);
+        const message = parseError instanceof Error ? parseError.message : "Unknown error";
         return {
           sessionId: "",
-          error: `Unable to extract readable content: ${parseError.message || "Unknown error"}`,
+          error: `Unable to extract readable content: ${message}`,
         };
       }
 
@@ -178,7 +178,7 @@ export const scrapeSource = action({
             embedding: embedding,
             index: i,
           });
-        } catch (embeddingError: any) {
+        } catch {
           // Retry once on failure
           try {
             await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -192,7 +192,7 @@ export const scrapeSource = action({
               embedding: embedding,
               index: i,
             });
-          } catch (retryError) {
+          } catch {
             return {
               sessionId: "",
               error: "Failed to generate embeddings. Please try again later.",
@@ -215,7 +215,7 @@ export const scrapeSource = action({
           jargonWords,
           createdAt: Date.now(),
         });
-      } catch (dbError) {
+      } catch {
         return {
           sessionId: "",
           error: "Failed to store source material. Please try again.",
@@ -223,7 +223,7 @@ export const scrapeSource = action({
       }
 
       return { sessionId, sourceText: readableText };
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Unexpected error in scrapeSource:", error);
       return {
         sessionId: "",

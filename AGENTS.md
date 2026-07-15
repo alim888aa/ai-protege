@@ -1,9 +1,3 @@
-# AI Protege Agent Instructions
-
-AI Protege is a portfolio polish project for proving AI-enabled SaaS, learning workflows, canvas-based product UX, Convex, Clerk, and full-stack product execution.
-
-The goal is client conversion. Treat this repo as a project that needs to look credible to Upwork clients, not as a hackathon artifact to keep expanding forever.
-
 ## Working Style
 
 Keep responses short, direct, and conversational. Ask smart questions when decisions matter. Ask up to 3 questions at a time.
@@ -12,7 +6,7 @@ Inspect the repo before proposing broad changes. Explain the current state in pl
 
 Do not assume product, pricing, architecture, stack, or portfolio-positioning decisions. State the decision that needs to be made and ask the user.
 
-Push back when a request risks messy architecture, weak portfolio value, unpaid overwork, or a demo that looks impressive but cannot be maintained.
+Push back when a request risks messy architecture or duplication and/or cannot be maintained.
 
 Before meaningful feature work, scan the codebase and answer what can be answered from existing code. Then ask focused questions in order, so each answer unlocks the next useful decision.
 
@@ -20,11 +14,7 @@ Before meaningful feature work, scan the codebase and answer what can be answere
 
 AI Protege helps learners understand material by teaching an AI student. The core loop is source material -> extracted concepts -> drawing and explaining on a canvas -> AI questions and source-grounded feedback.
 
-The strongest portfolio angle is AI learning SaaS with RAG, multimodal canvas input, auth, database-backed sessions, and a polished product surface.
-
 Current polish direction as of 2026-07-09: build a controlled interactive landing-page demo that shows the canvas teaching experience using canned Excalidraw elements. Prefer a landing-only product window over embedding the full authenticated teaching route.
-
-Do not promote the old hackathon blog as the main proof. It can stay as private context, but public positioning should make the project feel like a serious SaaS product.
 
 ## Source Of Truth
 
@@ -46,8 +36,6 @@ Tiny bug fixes can skip a plan if the agent explains why.
 
 Plans should be short and practical: goal, files likely touched, decisions needed, verification path, and risks.
 
-For landing-page work, keep the finish line tied to portfolio conversion: a credible first screen, clear product story, real product visual, metadata, and a clean path to sign up or try the demo.
-
 ## Architecture And ADRs
 
 `docs/adr/` is the canonical ADR location.
@@ -58,7 +46,7 @@ If no ADR applies, use `.agents/skills/feature-adr/SKILL.md` before implementati
 
 Ask before creating or accepting an ADR. Do not write architecture decisions silently.
 
-Write ADRs in plain language. Explain the real constraint, the tradeoff, and what future agents must avoid breaking.
+Write ADRs in plain language. Explain WHY a feature works/implemented the way it is and what future agents must avoid breaking.
 
 ## Repo Shape
 
@@ -129,6 +117,8 @@ For landing-page changes, verify desktop and mobile screenshots in browser befor
 For Excalidraw/demo changes, verify the canvas renders nonblank and does not hijack page scroll or keyboard focus.
 
 State whether the result is repo-verified, browser-verified, or unverified.
+
+Run a reviewer agent after a large chunk of work.
 
 ## Git Workflow
 

@@ -1,42 +1,46 @@
 'use client';
 
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import type { EvaluationResult } from '@/app/actions/evaluateTeaching';
+import type { EvaluationResult } from './types';
 import { ScoreDisplay } from './ScoreDisplay';
 import { ScoreBreakdown } from './ScoreBreakdown';
 import { FeedbackSection } from './FeedbackSection';
 import { QuestionsSection } from './QuestionsSection';
 
+function parseEvaluation(encodedData: string | null):
+  | { evaluation: EvaluationResult; error: null }
+  | { evaluation: null; error: string } {
+  if (!encodedData) {
+    return {
+      evaluation: null,
+      error: 'No evaluation data found. Please complete a teaching session first.',
+    };
+  }
+
+  try {
+    return {
+      evaluation: JSON.parse(decodeURIComponent(encodedData)) as EvaluationResult,
+      error: null,
+    };
+  } catch (error) {
+    console.error('Error parsing evaluation data:', error);
+    return {
+      evaluation: null,
+      error: 'Failed to load evaluation results. The data may be corrupted.',
+    };
+  }
+}
+
 export function ResultsClient() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const [evaluation, setEvaluation] = useState<EvaluationResult | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    try {
-      // Parse evaluation data from URL search params
-      const encodedData = searchParams.get('data');
-      if (!encodedData) {
-        setError('No evaluation data found. Please complete a teaching session first.');
-        return;
-      }
-
-      const decodedData = decodeURIComponent(encodedData);
-      const parsedEvaluation = JSON.parse(decodedData) as EvaluationResult;
-      setEvaluation(parsedEvaluation);
-    } catch (err) {
-      console.error('Error parsing evaluation data:', err);
-      setError('Failed to load evaluation results. The data may be corrupted.');
-    }
-  }, [searchParams]);
+  const result = parseEvaluation(searchParams.get('data'));
 
   const handleStartNewSession = () => {
     router.push('/');
   };
 
-  if (error) {
+  if (result.evaluation === null) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-zinc-900 flex items-center justify-center p-6">
         <div className="max-w-md w-full bg-white dark:bg-zinc-800 rounded-lg shadow-lg p-8">
@@ -45,7 +49,7 @@ export function ResultsClient() {
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
               Error Loading Results
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">{error}</p>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">{result.error}</p>
             <button
               onClick={handleStartNewSession}
               className="px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
@@ -58,13 +62,7 @@ export function ResultsClient() {
     );
   }
 
-  if (!evaluation) {
-    return (
-      <div className="min-h-screen bg-gray-50 dark:bg-zinc-900 flex items-center justify-center">
-        <div className="text-gray-600 dark:text-gray-400">Loading results...</div>
-      </div>
-    );
-  }
+  const evaluation = result.evaluation;
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-zinc-900 py-12 px-6">

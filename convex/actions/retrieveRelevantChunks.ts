@@ -5,7 +5,7 @@ import { v } from "convex/values";
 import { embed } from "ai";
 import { openai } from "@ai-sdk/openai";
 import { cosineSimilarity } from "../utils/similarity";
-import { api } from "../_generated/api";
+import { api, internal } from "../_generated/api";
 
 /**
  * Retrieves the top 5 most relevant chunks from source material
@@ -26,6 +26,7 @@ export const retrieveRelevantChunks = action({
   ): Promise<
     Array<{ text: string; similarity: number; index: number }>
   > => {
+    await ctx.runQuery(internal.billing.requireEntitledUser, {});
     const { sessionId, textExplanation } = args;
 
     try {
@@ -37,7 +38,7 @@ export const retrieveRelevantChunks = action({
           value: textExplanation,
         });
         explanationEmbedding = embedding;
-      } catch (embeddingError: any) {
+      } catch {
         // Retry once on failure
         try {
           await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -46,7 +47,7 @@ export const retrieveRelevantChunks = action({
             value: textExplanation,
           });
           explanationEmbedding = embedding;
-        } catch (retryError) {
+        } catch {
           throw new Error("Failed to generate embedding for text explanation");
         }
       }
@@ -82,10 +83,10 @@ export const retrieveRelevantChunks = action({
         .slice(0, 5);
 
       return topChunks;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error in retrieveRelevantChunks:", error);
       throw new Error(
-        error.message || "Failed to retrieve relevant chunks"
+        error instanceof Error ? error.message : "Failed to retrieve relevant chunks"
       );
     }
   },

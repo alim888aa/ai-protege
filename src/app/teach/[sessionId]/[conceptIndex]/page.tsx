@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import { LoadingIndicator } from '@/app/components/LoadingIndicator';
 import { TeachingClient } from './_components/TeachingClient';
+import { SubscriptionGate } from '@/app/components/billing';
 
 interface PageProps {
   params: Promise<{
@@ -20,9 +21,11 @@ export default async function TeachingPage({ params }: PageProps) {
   }
 
   return (
-    <Suspense fallback={<LoadingFallback />}>
-      <TeachingClient sessionId={sessionId} conceptIndex={conceptIdx} />
-    </Suspense>
+    <SubscriptionGate>
+      <Suspense fallback={<LoadingFallback />}>
+        <TeachingClient sessionId={sessionId} conceptIndex={conceptIdx} />
+      </Suspense>
+    </SubscriptionGate>
   );
 }
 

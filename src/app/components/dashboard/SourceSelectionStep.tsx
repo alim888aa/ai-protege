@@ -223,7 +223,7 @@ export function SourceSelectionStep({
               <div className="flex items-start">
                 <Info className="w-4 h-4 text-amber-500 mt-0.5 mr-2 flex-shrink-0" />
                 <p className="text-xs text-amber-800 dark:text-amber-200">
-                  You'll define your own concepts. The AI will use general knowledge to help you learn.
+                  You&apos;ll define your own concepts. The AI will use general knowledge to help you learn.
                 </p>
               </div>
             </div>

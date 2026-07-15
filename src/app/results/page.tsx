@@ -1,5 +1,6 @@
 import { Suspense } from 'react';
 import { ResultsClient } from './_components';
+import { SubscriptionGate } from '@/app/components/billing';
 
 function LoadingFallback() {
   return (
@@ -11,8 +12,10 @@ function LoadingFallback() {
 
 export default function ResultsPage() {
   return (
-    <Suspense fallback={<LoadingFallback />}>
-      <ResultsClient />
-    </Suspense>
+    <SubscriptionGate>
+      <Suspense fallback={<LoadingFallback />}>
+        <ResultsClient />
+      </Suspense>
+    </SubscriptionGate>
   );
 }

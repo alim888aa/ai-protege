@@ -6,7 +6,7 @@ import { embed } from "ai";
 import { openai } from "@ai-sdk/openai";
 import { chunkText } from "../utils/chunking";
 import { extractJargon } from "../utils/jargon";
-import { api } from "../_generated/api";
+import { api, internal } from "../_generated/api";
 import { extractText } from "unpdf";
 
 /**
@@ -26,6 +26,7 @@ export const processPdf = action({
     pdfBase64: v.string(),
   },
   handler: async (ctx, args): Promise<{ sessionId: string; sourceText?: string; error?: string }> => {
+    await ctx.runQuery(internal.billing.requireEntitledUser, {});
     const { topic, pdfBase64 } = args;
 
     try {
@@ -48,7 +49,7 @@ export const processPdf = action({
         for (let i = 0; i < binaryString.length; i++) {
           pdfBuffer[i] = binaryString.charCodeAt(i);
         }
-      } catch (e) {
+      } catch {
         return {
           sessionId: "",
           error: "Invalid PDF data. Please try uploading again.",

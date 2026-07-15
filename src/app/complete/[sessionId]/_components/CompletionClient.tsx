@@ -1,16 +1,16 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useQuery, useMutation } from 'convex/react';
+import { useAction, useQuery, useMutation } from 'convex/react';
 import { api } from '../../../../../convex/_generated/api';
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { generateSummary, generateSummaryFromData, SummaryResponse } from '../../../actions/generateSummary';
 import { getCachedSessionData, clearSessionCache, CachedSessionData } from '../../../utils/sessionCache';
 import { LoadingState } from './LoadingState';
 import { ErrorState } from './ErrorState';
 import { CompletedState } from './CompletedState';
 import { SummaryState } from './SummaryState';
 import { TopicTaggedElement } from '../../../utils/topicAreaManager';
+import type { SummaryResponse } from './types';
 
 type CompletionState = 'loading' | 'summary' | 'completed' | 'error';
 
@@ -34,7 +34,7 @@ export function CompletionClient({ sessionId }: CompletionClientProps) {
   );
   
   const markCompleteMutation = useMutation(api.mutations.markComplete);
-  const saveSummaryMutation = useMutation(api.mutations.saveSummary);
+  const generateSummaryAction = useAction(api.actions.generateSummary.generateSummary);
 
   const [state, setState] = useState<CompletionState>('loading');
   const [summary, setSummary] = useState<SummaryResponse | null>(null);
@@ -66,18 +66,8 @@ export function CompletionClient({ sessionId }: CompletionClientProps) {
       setSessionExplanations(data.explanations);
       
       // Generate summary using cached data (no Convex fetch needed)
-      const result = await generateSummaryFromData(data);
+      const result = await generateSummaryAction({ sessionId });
       setSummary(result);
-      
-      // Save summary to database for persistence
-      await saveSummaryMutation({
-        sessionId,
-        summary: {
-          text: result.summary,
-          keyConceptsCovered: result.keyConceptsCovered,
-          analogiesUsed: result.analogiesUsed,
-        },
-      });
       
       // Clear cache after successful save
       clearSessionCache(sessionId);
@@ -87,7 +77,7 @@ export function CompletionClient({ sessionId }: CompletionClientProps) {
       setError(err instanceof Error ? err.message : 'Failed to generate summary');
       setState('error');
     }
-  }, [sessionId, saveSummaryMutation]);
+  }, [sessionId, generateSummaryAction]);
 
   // Generate summary from Convex data (fallback path)
   const generateFromConvex = useCallback(async (currentSession: NonNullable<typeof session>) => {
@@ -109,25 +99,16 @@ export function CompletionClient({ sessionId }: CompletionClientProps) {
       setSessionTopic(currentSession.topic);
       setSessionExplanations(currentSession.explanations ?? []);
       
-      const result = await generateSummary(sessionId);
+      const result = await generateSummaryAction({ sessionId });
       setSummary(result);
-      
-      await saveSummaryMutation({
-        sessionId,
-        summary: {
-          text: result.summary,
-          keyConceptsCovered: result.keyConceptsCovered,
-          analogiesUsed: result.analogiesUsed,
-        },
-      });
-      
+
       setState('summary');
     } catch (err) {
       console.error('Failed to generate summary:', err);
       setError(err instanceof Error ? err.message : 'Failed to generate summary');
       setState('error');
     }
-  }, [sessionId, saveSummaryMutation]);
+  }, [sessionId, generateSummaryAction]);
 
   useEffect(() => {
     if (hasFetchedRef.current) return;

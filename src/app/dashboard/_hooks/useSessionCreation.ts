@@ -4,7 +4,6 @@ import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAction, useMutation } from 'convex/react';
 import { api } from '../../../../convex/_generated/api';
-import { extractConcepts } from '../../actions/extractConcepts';
 
 export type Step = 'topic' | 'source';
 export type SourceType = 'url' | 'pdf' | 'none';
@@ -15,6 +14,7 @@ export function useSessionCreation() {
   // Convex hooks
   const scrapeSource = useAction(api.actions.scrapeSource.scrapeSource);
   const processPdf = useAction(api.actions.processPdf.processPdf);
+  const extractConcepts = useAction(api.actions.extractConcepts.extractConcepts);
   const createManualSourceMaterial = useMutation(api.mutations.createManualSourceMaterial);
   const updateConceptsInSourceMaterial = useMutation(api.mutations.updateConceptsInSourceMaterial);
 
@@ -165,7 +165,10 @@ export function useSessionCreation() {
 
       // Extract concepts from source text
       try {
-        const concepts = await extractConcepts(topic.trim(), sourceText!);
+        const concepts = await extractConcepts({
+          topic: topic.trim(),
+          sourceText: sourceText!,
+        });
 
         if (!concepts || concepts.length === 0) {
           setError('Failed to extract concepts from the source material. Please try again.');
@@ -203,6 +206,7 @@ export function useSessionCreation() {
     validateUrl,
     scrapeSource,
     processPdf,
+    extractConcepts,
     createManualSourceMaterial,
     updateConceptsInSourceMaterial,
     router,

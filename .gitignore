@@ -12,6 +12,9 @@
 
 # testing
 /coverage
+/.codex-*.png
+/.playwright-cli/
+/.pnpm-store/
 
 # next.js
 /.next/

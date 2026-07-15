@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import { ConceptReviewClient } from './_components';
+import { SubscriptionGate } from '@/app/components/billing';
 
 interface PageProps {
   params: Promise<{
@@ -14,5 +15,9 @@ export default async function ConceptReviewPage({ params }: PageProps) {
     notFound();
   }
 
-  return <ConceptReviewClient sessionId={sessionId} />;
+  return (
+    <SubscriptionGate>
+      <ConceptReviewClient sessionId={sessionId} />
+    </SubscriptionGate>
+  );
 }

@@ -1,4 +1,4 @@
-import { SummaryResponse } from '../../../actions/generateSummary';
+import type { SummaryResponse } from './types';
 import { ExportButtons } from './ExportButtons';
 
 interface CompletedStateProps {

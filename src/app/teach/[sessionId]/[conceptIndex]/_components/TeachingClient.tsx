@@ -1,6 +1,5 @@
 'use client';
 
-import { useMemo } from 'react';
 import { useQuery } from 'convex/react';
 import { api } from '../../../../../../convex/_generated/api';
 import { LoadingIndicator } from '@/app/components/LoadingIndicator';
@@ -19,14 +18,12 @@ export function TeachingClient({ sessionId, conceptIndex }: TeachingClientProps)
   const currentConcept = session?.concepts?.[conceptIndex];
   const totalConcepts = session?.concepts?.length ?? 0;
 
-  const currentDialogue = useMemo(
-    () => session?.dialogues?.find((d) => d.conceptId === currentConcept?.id),
-    [session?.dialogues, currentConcept?.id]
+  const currentDialogue = session?.dialogues?.find(
+    (dialogue) => dialogue.conceptId === currentConcept?.id
   );
 
-  const currentExplanation = useMemo(
-    () => session?.explanations?.find((e) => e.conceptId === currentConcept?.id),
-    [session?.explanations, currentConcept?.id]
+  const currentExplanation = session?.explanations?.find(
+    (explanation) => explanation.conceptId === currentConcept?.id
   );
 
   // Loading state
@@ -47,9 +44,6 @@ export function TeachingClient({ sessionId, conceptIndex }: TeachingClientProps)
     );
   }
 
-  // Determine if session has source material (not "none" type)
-  const hasSourceMaterial = session.sourceType !== 'none' && session.sourceType !== undefined;
-
   return (
     <TeachingLayout
       sessionId={sessionId}
@@ -58,7 +52,6 @@ export function TeachingClient({ sessionId, conceptIndex }: TeachingClientProps)
       totalConcepts={totalConcepts}
       currentDialogue={currentDialogue}
       currentExplanation={currentExplanation}
-      hasSourceMaterial={hasSourceMaterial}
       topic={session.topic}
       concepts={session.concepts}
       dialogues={session.dialogues}

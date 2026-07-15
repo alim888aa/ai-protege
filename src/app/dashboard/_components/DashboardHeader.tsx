@@ -3,6 +3,7 @@
 import { UserButton } from "@clerk/nextjs";
 import { Brain } from "lucide-react";
 import Link from "next/link";
+import { ManageSubscriptionButton } from "@/app/components/billing";
 
 export function DashboardHeader() {
   return (
@@ -14,17 +15,20 @@ export function DashboardHeader() {
           </div>
           <h1 className="text-2xl font-bold text-gray-900">AI Protégé</h1>
         </Link>
-        <UserButton
-          appearance={{
-            elements: {
-              avatarBox:
-                "w-9 h-9 ring-2 ring-blue-500/20 hover:ring-blue-500/40 transition-all duration-200",
-              userButtonPopoverCard:
-                "shadow-2xl shadow-gray-400/30 border border-gray-200/50 bg-gray-100",
-              userButtonPopoverActionButton: "hover:bg-gray-200",
-            },
-          }}
-        />
+        <div className="flex items-center gap-3">
+          <ManageSubscriptionButton />
+          <UserButton
+            appearance={{
+              elements: {
+                avatarBox:
+                  "w-9 h-9 ring-2 ring-blue-500/20 hover:ring-blue-500/40 transition-all duration-200",
+                userButtonPopoverCard:
+                  "shadow-2xl shadow-gray-400/30 border border-gray-200/50 bg-gray-100",
+                userButtonPopoverActionButton: "hover:bg-gray-200",
+              },
+            }}
+          />
+        </div>
       </div>
     </header>
   );

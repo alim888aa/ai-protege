@@ -1,5 +1,5 @@
 export { HeroSection } from './HeroSection';
-export { DemoSection } from './DemoSection';
+export { MarketingHeader } from './MarketingHeader';
 export { HowItWorksSection } from './HowItWorksSection';
 export { CTASection } from './CTASection';
 export { Footer } from './Footer';

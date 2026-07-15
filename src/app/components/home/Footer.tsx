@@ -1,16 +1,17 @@
+import Link from 'next/link';
+import { BrainCircuit } from 'lucide-react';
+
 export function Footer() {
   return (
-    <footer className="pb-10 pt-6">
-      <div className="flex flex-col items-center justify-center gap-3">
-        <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-100 to-amber-100 dark:from-orange-900/30 dark:to-amber-900/30 rounded-full border border-orange-200 dark:border-orange-800">
-          <span className="text-lg">🎃</span>
-          <span className="text-sm font-medium text-orange-700 dark:text-orange-300">
-            Made for Kiroween Hackathon
-          </span>
-        </div>
-        <p className="text-sm text-gray-500 dark:text-gray-500">
-          Built with Kiro AI
-        </p>
+    <footer className="mx-auto flex w-full max-w-[1440px] flex-col gap-5 px-5 pb-10 pt-3 text-zinc-500 sm:flex-row sm:items-center sm:justify-between md:px-8 lg:px-10">
+      <div className="inline-flex items-center gap-2 text-zinc-300">
+        <BrainCircuit className="size-4" />
+        <span className="text-xs font-bold tracking-[0.12em]">AI PROTÉGÉ</span>
+      </div>
+      <div className="flex items-center gap-5 text-xs">
+        <Link href="/pricing" className="transition hover:text-white">Pricing</Link>
+        <Link href="/sign-in" className="transition hover:text-white">Sign in</Link>
+        <span className="hidden sm:inline">Made for Kiroween Hackathon · Built with Kiro AI</span>
       </div>
     </footer>
   );

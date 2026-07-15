@@ -1,4 +1,4 @@
-import type { EvaluationResult } from '@/app/actions/evaluateTeaching';
+import type { EvaluationResult } from './types';
 import { getScoreColor, getProgressBarColor } from './utils';
 
 interface ScoreBreakdownProps {

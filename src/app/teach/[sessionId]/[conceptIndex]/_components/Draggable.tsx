@@ -1,10 +1,17 @@
 'use client';
 
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 
 interface Position {
   x: number;
   y: number;
+}
+
+interface DragMetrics {
+  width: number;
+  height: number;
+  viewportWidth: number;
+  viewportHeight: number;
 }
 
 interface DraggableProps {
@@ -38,89 +45,105 @@ export function Draggable({
 }: DraggableProps) {
   const [position, setPosition] = useState<Position | null>(initialPosition || null);
   const [isDragging, setIsDragging] = useState(false);
+  const [dragMetrics, setDragMetrics] = useState<DragMetrics | null>(null);
   const dragOffset = useRef<Position>({ x: 0, y: 0 });
-  const elementRef = useRef<HTMLDivElement>(null);
 
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLElement;
+    if (target.closest('[data-resize-handle]')) {
+      return;
+    }
+
     // Check if we should only drag from handle
     if (handleClassName) {
-      const target = e.target as HTMLElement;
       if (!target.closest(`.${handleClassName}`)) {
         return;
       }
     }
 
     e.preventDefault();
+    e.currentTarget.setPointerCapture(e.pointerId);
     setIsDragging(true);
 
-    const rect = elementRef.current?.getBoundingClientRect();
-    if (rect) {
-      dragOffset.current = {
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top,
-      };
-      
-      // Initialize position if not set
-      if (!position) {
-        setPosition({ x: rect.left, y: rect.top });
-      }
-    }
-  }, [handleClassName, position]);
+    const rect = e.currentTarget.getBoundingClientRect();
+    dragOffset.current = {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    };
+    setDragMetrics({
+      width: rect.width,
+      height: rect.height,
+      viewportWidth: window.innerWidth,
+      viewportHeight: window.innerHeight,
+    });
 
-  const handleMouseMove = useCallback((e: MouseEvent) => {
-    if (!isDragging || !elementRef.current) return;
+    // Initialize position if the component was previously using CSS positioning.
+    if (!position) {
+      setPosition({ x: rect.left, y: rect.top });
+    }
+  };
+
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!isDragging) return;
 
     let newX = e.clientX - dragOffset.current.x;
     let newY = e.clientY - dragOffset.current.y;
+    const rect = e.currentTarget.getBoundingClientRect();
 
     // Constrain to viewport
     if (constrainToViewport) {
-      const rect = elementRef.current.getBoundingClientRect();
       const maxX = window.innerWidth - rect.width;
       const maxY = window.innerHeight - rect.height;
-      
+
       newX = Math.max(0, Math.min(newX, maxX));
       newY = Math.max(0, Math.min(newY, maxY));
     }
 
     const newPosition = { x: newX, y: newY };
+    setDragMetrics({
+      width: rect.width,
+      height: rect.height,
+      viewportWidth: window.innerWidth,
+      viewportHeight: window.innerHeight,
+    });
     setPosition(newPosition);
     onPositionChange?.(newPosition);
-  }, [isDragging, constrainToViewport, onPositionChange]);
+  };
 
-  const handleMouseUp = useCallback(() => {
-    setIsDragging(false);
-  }, []);
-
-  useEffect(() => {
-    if (isDragging) {
-      window.addEventListener('mousemove', handleMouseMove);
-      window.addEventListener('mouseup', handleMouseUp);
-      return () => {
-        window.removeEventListener('mousemove', handleMouseMove);
-        window.removeEventListener('mouseup', handleMouseUp);
-      };
+  const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+      e.currentTarget.releasePointerCapture(e.pointerId);
     }
-  }, [isDragging, handleMouseMove, handleMouseUp]);
+    setIsDragging(false);
+  };
 
   const style: React.CSSProperties = position
-    ? {
+    ? dragMetrics
+      ? {
         position: 'fixed',
         // Use right positioning to maintain right-anchor behavior
-        right: window.innerWidth - position.x - (elementRef.current?.getBoundingClientRect().width || 0),
+        right: dragMetrics.viewportWidth - position.x - dragMetrics.width,
         ...(anchorBottom
-          ? { bottom: window.innerHeight - position.y - (elementRef.current?.getBoundingClientRect().height || 0) }
+          ? { bottom: dragMetrics.viewportHeight - position.y - dragMetrics.height }
           : { top: position.y }),
         cursor: isDragging ? 'grabbing' : undefined,
       }
+      : {
+          position: 'fixed',
+          left: position.x,
+          top: position.y,
+          cursor: isDragging ? 'grabbing' : undefined,
+        }
     : {
         cursor: isDragging ? 'grabbing' : undefined,
       };
 
   return (
     <div
-      ref={elementRef}
-      onMouseDown={handleMouseDown}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={handlePointerUp}
       className={className}
       style={style}
     >

@@ -4,7 +4,7 @@ import { useRef, useCallback, useState } from 'react';
 import { ExcalidrawAPI } from '@/app/components/ExcalidrawWrapper';
 import { calculateTopicPosition, getTopicBounds, defaultTopicAreaConfig } from '@/app/utils/topicAreaManager';
 
-export function useCanvasHandlers(conceptIndex: number, resetTimer: () => void) {
+export function useCanvasHandlers(conceptIndex: number) {
   const excalidrawApiRef = useRef<ExcalidrawAPI | null>(null);
   const canvasElementsRef = useRef<readonly unknown[]>([]);
   const [isOutOfBounds, setIsOutOfBounds] = useState(false);
@@ -13,10 +13,9 @@ export function useCanvasHandlers(conceptIndex: number, resetTimer: () => void) 
     (elements: readonly unknown[]) => {
       if (elements && Array.isArray(elements)) {
         canvasElementsRef.current = elements;
-        resetTimer();
       }
     },
-    [resetTimer]
+    []
   );
 
   const handleApiReady = useCallback((api: ExcalidrawAPI) => {

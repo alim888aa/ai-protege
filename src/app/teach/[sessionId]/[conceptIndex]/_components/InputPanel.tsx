@@ -67,6 +67,7 @@ export function InputPanel({
         <div className="drag-handle flex items-center justify-between h-7 bg-gray-100 dark:bg-zinc-700 rounded-t-lg cursor-grab active:cursor-grabbing border-b border-gray-200 dark:border-zinc-600 px-2">
           <div className="w-12 h-1 bg-gray-300 dark:bg-zinc-500 rounded-full mx-auto" />
           <div
+            data-resize-handle
             className="w-4 h-4 cursor-ne-resize flex items-center justify-center"
             onMouseDown={handleResize}
           >

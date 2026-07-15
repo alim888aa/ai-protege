@@ -14,6 +14,10 @@ export interface ExportOptions {
   scale?: number;
 }
 
+function isActiveContentElement(element: TopicTaggedElement) {
+  return element.isDeleted !== true && !element.customData?.isBoundary;
+}
+
 /**
  * Creates a blank canvas as base64 PNG
  */
@@ -60,16 +64,12 @@ export async function exportTopicCanvasForAI(
   const typedElements = elements as TopicTaggedElement[];
   
   // First try to filter by topicId tag
-  let topicElements = filterElementsByTopic(typedElements, topicId).filter(
-    (el) => !el.customData?.isBoundary
-  );
+  let topicElements = filterElementsByTopic(typedElements, topicId).filter(isActiveContentElement);
 
   // If no tagged elements found, include ALL non-boundary elements
   // This handles the case where elements haven't been tagged yet
   if (topicElements.length === 0) {
-    topicElements = typedElements.filter(
-      (el) => !el.customData?.isBoundary && !el.isDeleted
-    );
+    topicElements = typedElements.filter(isActiveContentElement);
   }
 
   // If still no elements, return blank canvas
@@ -81,9 +81,6 @@ export async function exportTopicCanvasForAI(
     // Dynamically import Excalidraw export utilities
     const { exportToBlob } = await import('@excalidraw/excalidraw');
 
-    // Calculate bounds of the topic elements
-    const bounds = calculateElementsBounds(topicElements);
-    
     // Create app state for export
     const appState = {
       exportBackground: true,
@@ -221,7 +218,7 @@ export async function exportFullCanvasForAI(
 
   // Filter out boundary elements
   const typedElements = elements as TopicTaggedElement[];
-  const contentElements = typedElements.filter((el) => !el.customData?.isBoundary);
+  const contentElements = typedElements.filter(isActiveContentElement);
 
   if (contentElements.length === 0) {
     return createBlankCanvas();

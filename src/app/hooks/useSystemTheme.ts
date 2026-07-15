@@ -1,17 +1,19 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useSyncExternalStore } from 'react';
+
+const systemThemeQuery = '(prefers-color-scheme: dark)';
+
+function subscribeToSystemTheme(onStoreChange: () => void) {
+  const mediaQuery = window.matchMedia(systemThemeQuery);
+  mediaQuery.addEventListener('change', onStoreChange);
+  return () => mediaQuery.removeEventListener('change', onStoreChange);
+}
+
+function getSystemTheme(): 'light' | 'dark' {
+  return window.matchMedia(systemThemeQuery).matches ? 'dark' : 'light';
+}
 
 export function useSystemTheme(): 'light' | 'dark' {
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
-  
-  useEffect(() => {
-    const mq = window.matchMedia('(prefers-color-scheme: dark)');
-    setTheme(mq.matches ? 'dark' : 'light');
-    const handler = (e: MediaQueryListEvent) => setTheme(e.matches ? 'dark' : 'light');
-    mq.addEventListener('change', handler);
-    return () => mq.removeEventListener('change', handler);
-  }, []);
-  
-  return theme;
+  return useSyncExternalStore(subscribeToSystemTheme, getSystemTheme, () => 'light');
 }

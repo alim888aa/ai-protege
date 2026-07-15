@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import { CompletionClient } from './_components';
+import { SubscriptionGate } from '@/app/components/billing';
 
 interface PageProps {
   params: Promise<{
@@ -14,5 +15,9 @@ export default async function CompletionPage({ params }: PageProps) {
     notFound();
   }
 
-  return <CompletionClient sessionId={sessionId} />;
+  return (
+    <SubscriptionGate>
+      <CompletionClient sessionId={sessionId} />
+    </SubscriptionGate>
+  );
 }

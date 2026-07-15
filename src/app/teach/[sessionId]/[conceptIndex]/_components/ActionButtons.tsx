@@ -222,7 +222,7 @@ export function ActionButtons({
       {showHintButton && !isSubmitting && hintCount >= 3 && (
         <div className="w-full px-4 py-3 bg-gray-100 dark:bg-zinc-700 rounded-lg border-2 border-gray-300 dark:border-zinc-600 text-center animate-fadeIn">
           <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
-            🎯 Out of hints! Try your best or click "Done Explaining" to continue.
+            🎯 Out of hints! Try your best or click &quot;Done Explaining&quot; to continue.
           </p>
         </div>
       )}

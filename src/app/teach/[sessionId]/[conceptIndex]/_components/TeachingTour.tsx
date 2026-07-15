@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo, type ComponentType } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { PenTool, MessageCircle, Lightbulb, Navigation, ChevronRight, ChevronLeft, X, type LucideIcon } from 'lucide-react';
 
 interface Rect {

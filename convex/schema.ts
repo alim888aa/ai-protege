@@ -2,6 +2,48 @@ import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
 export default defineSchema({
+  billingCustomers: defineTable({
+    userId: v.string(),
+    polarEnvironment: v.optional(
+      v.union(v.literal("production"), v.literal("sandbox"))
+    ),
+    polarCustomerId: v.string(),
+    subscriptionId: v.optional(v.string()),
+    productId: v.optional(v.string()),
+    status: v.union(
+      v.literal("active"),
+      v.literal("trialing"),
+      v.literal("inactive")
+    ),
+    hasAccess: v.boolean(),
+    cancelAtPeriodEnd: v.boolean(),
+    currentPeriodEnd: v.optional(v.number()),
+    trialEnd: v.optional(v.number()),
+    eventTimestamp: v.number(),
+    eventId: v.optional(v.string()),
+    eventOrderKey: v.optional(v.string()),
+    updatedAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_user_environment", ["userId", "polarEnvironment"])
+    .index("by_polar_customer", ["polarCustomerId"]),
+
+  landingDemoLimits: defineTable({
+    visitorHash: v.string(),
+    claimToken: v.string(),
+    usageDay: v.optional(v.string()),
+    expiresAt: v.number(),
+    createdAt: v.number(),
+  })
+    .index("by_visitor_hash", ["visitorHash"])
+    .index("by_expires_at", ["expiresAt"]),
+
+  landingDemoDailyUsage: defineTable({
+    day: v.string(),
+    count: v.number(),
+    updatedAt: v.number(),
+  }).index("by_day", ["day"]),
+
   // Maps session-concept pairs to Agent component thread IDs
   // This allows us to use proper Agent threads for streaming
   threadMappings: defineTable({

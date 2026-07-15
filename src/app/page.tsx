@@ -1,6 +1,5 @@
 import {
   HeroSection,
-  DemoSection,
   HowItWorksSection,
   CTASection,
   Footer,
@@ -8,9 +7,8 @@ import {
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-zinc-900 dark:via-zinc-800 dark:to-zinc-900">
+    <div className="min-h-screen overflow-x-clip bg-[#09090b] text-zinc-50">
       <HeroSection />
-      <DemoSection />
       <HowItWorksSection />
       <CTASection />
       <Footer />
