@@ -12,10 +12,12 @@ ESLint completes with zero findings. TypeScript, all eight billing webhook regre
 
 Convex deployed successfully to `beaming-giraffe-567` with the billing and landing-demo tables and functions. A direct unsigned POST to the production Polar webhook returned `403`, confirming that signature verification is active. The production billing environment was checked by expected values and secret formats without displaying credentials.
 
+Vercel deployed commit `4f7f098` successfully. Live checks against `ai-protege.xyz` returned `200` for the landing, pricing, sign-in, and dashboard routes. Playwright verified the production pricing page at desktop and mobile widths with the $10 monthly plan, $80 yearly plan, seven-day trial, unlimited benefits, and no browser errors. Clicking the monthly trial button while signed out reached the production Clerk sign-up page and preserved `plan=monthly` in the return URL.
+
 ## Remaining risk
 
-Authenticated review and teaching interactions still need a production smoke test because the isolated browser runner has no Clerk test identity. The release combines landing, teaching-flow, access-control, and billing changes in one deployment. Production Polar and Convex configuration must be checked by variable name without exposing secret values. URL importing retains a known SSRF risk at the user's direction and needs a pinned, redirect-aware downloader in immediate follow-up work.
+Authenticated review and teaching interactions still need a production smoke test because the isolated browser runner has no Clerk test identity. A complete live checkout, entitlement, customer-portal, and cancellation pass would create a real production customer and therefore remains owner-run; those cases passed in Polar Sandbox. The release combines landing, teaching-flow, access-control, and billing changes in one deployment. URL importing retains a known SSRF risk at the user's direction and needs a pinned, redirect-aware downloader in immediate follow-up work.
 
 ## Next
 
-Commit and push the production configuration note, deploy Vercel, and smoke-test the public and authenticated production flows.
+Run one owner-controlled production trial from checkout through cancellation, then harden URL importing in a focused follow-up.

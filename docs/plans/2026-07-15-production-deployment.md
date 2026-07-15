@@ -16,7 +16,7 @@ Include all current product changes in the release. Keep local package caches an
 
 Require zero ESLint findings, passing TypeScript and billing regression tests, a successful optimized build, an independent review, successful Convex and Vercel production deployments, and live smoke tests for public pages, authentication, checkout, entitlement, portal, and cancellation.
 
-Convex production and the Polar webhook are complete. The remaining release gate is the Vercel deployment plus public and authenticated smoke testing.
+Convex, Polar, and Vercel production deployment are complete. Public desktop and mobile smoke tests passed, and the signed-out subscription CTA correctly reaches Clerk with its selected plan preserved. The only deferred check is an owner-controlled real production checkout through cancellation; the equivalent Sandbox cases passed.
 
 ## Risks
 
