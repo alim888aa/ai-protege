@@ -16,6 +16,8 @@ Include all current product changes in the release. Keep local package caches an
 
 Require zero ESLint findings, passing TypeScript and billing regression tests, a successful optimized build, an independent review, successful Convex and Vercel production deployments, and live smoke tests for public pages, authentication, checkout, entitlement, portal, and cancellation.
 
+Convex production and the Polar webhook are complete. The remaining release gate is the Vercel deployment plus public and authenticated smoke testing.
+
 ## Risks
 
 The release combines several months of landing, teaching-flow, billing, and access-control work. Production Polar and Convex credentials must remain isolated from Sandbox. A live checkout smoke test may create a real trial customer, so any real payment step stays visible to the account owner. URL import still follows redirects after incomplete private-address checks; the user explicitly chose to preserve that behavior for this release, so SSRF hardening remains urgent follow-up work.
