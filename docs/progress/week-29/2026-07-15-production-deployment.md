@@ -21,3 +21,7 @@ Authenticated review and teaching interactions still need a production smoke tes
 ## Next
 
 Run one owner-controlled production trial from checkout through cancellation, then harden URL importing in a focused follow-up.
+
+## July 18 theme and legal release
+
+Commit `4e5f90a` shipped the app-wide dark-first theme, navbar theme toggle, Terms and Privacy pages, and historical project cleanup through the existing GitHub-to-Vercel production connection. Vercel completed successfully. Live checks returned `200` for the landing, pricing, Terms, Privacy, and sign-in routes; the signed-out dashboard route correctly resolved to sign-in. The GitHub repository description was also updated to remove the old hackathon copy and demo credentials. The local development server was stopped after deployment.
