@@ -78,7 +78,7 @@ export function DialogueMessageSkeleton({ isUser = false }: { isUser?: boolean }
     <div
       className={`p-4 rounded-lg animate-pulse ${
         isUser
-          ? 'bg-blue-50 dark:bg-blue-900/20 ml-8'
+          ? 'bg-violet-50 dark:bg-violet-900/20 ml-8'
           : 'bg-gray-100 dark:bg-zinc-700 mr-8'
       }`}
     >

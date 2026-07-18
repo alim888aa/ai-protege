@@ -58,7 +58,6 @@ const ExcalidrawWithMenu = dynamic<EmbeddedExcalidrawProps>(
           <MainMenuComponent>
             <MainMenuComponent.DefaultItems.Help />
             <MainMenuComponent.DefaultItems.ChangeCanvasBackground />
-            <MainMenuComponent.DefaultItems.ToggleTheme />
           </MainMenuComponent>
           {children}
         </ExcalidrawComponent>
@@ -115,7 +114,7 @@ const teachingUiOptions: ExcalidrawProps['UIOptions'] = {
     export: false,
     clearCanvas: false,
     saveAsImage: false,
-    toggleTheme: true,
+    toggleTheme: false,
     changeViewBackgroundColor: true,
   },
   tools: { image: false },

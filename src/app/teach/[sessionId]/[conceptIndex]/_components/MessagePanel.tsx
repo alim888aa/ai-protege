@@ -151,10 +151,10 @@ function MessageBubble({ message, fontSize }: { message: Message; fontSize: numb
   const isUser = message.role === 'user';
   return (
     <div
-      className={`p-2 rounded-lg ${isUser ? 'bg-blue-50 dark:bg-blue-900/20 ml-4' : 'bg-gray-100 dark:bg-zinc-700 mr-4'}`}
+      className={`p-2 rounded-lg ${isUser ? 'bg-violet-50 dark:bg-violet-900/20 ml-4' : 'bg-gray-100 dark:bg-zinc-700 mr-4'}`}
     >
       <span
-        className={`font-medium ${isUser ? 'text-blue-600 dark:text-blue-400' : 'text-green-600 dark:text-green-400'}`}
+        className={`font-medium ${isUser ? 'text-violet-600 dark:text-violet-400' : 'text-green-600 dark:text-green-400'}`}
         style={{ fontSize: fontSize * 0.75 }}
       >
         {isUser ? 'You' : 'AI'}
@@ -174,7 +174,7 @@ function StreamingBubble({ content, fontSize }: { content: string; fontSize: num
       </span>
       <p className="text-gray-900 dark:text-white whitespace-pre-wrap mt-1" style={{ fontSize }}>
         {content}
-        <span className="inline-block w-1 h-3 ml-0.5 bg-blue-500 animate-pulse" />
+        <span className="inline-block w-1 h-3 ml-0.5 bg-violet-500 animate-pulse" />
       </p>
     </div>
   );

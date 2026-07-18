@@ -216,7 +216,7 @@ export function TeachingTour({ topicName, onComplete }: TeachingTourProps) {
       {/* Highlight border */}
       {highlightRect && (
         <div
-          className="absolute border-2 border-indigo-500 rounded-xl pointer-events-none animate-pulse"
+          className="absolute border-2 border-violet-500 rounded-xl pointer-events-none animate-pulse"
           style={{
             left: highlightRect.left - 8,
             top: highlightRect.top - 8,
@@ -233,7 +233,7 @@ export function TeachingTour({ topicName, onComplete }: TeachingTourProps) {
       >
         {/* Header */}
         <div className="flex items-center gap-3 mb-3">
-          <div className="p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg text-indigo-600 dark:text-indigo-400">
+          <div className="p-2 bg-violet-100 dark:bg-violet-900/30 rounded-lg text-violet-600 dark:text-violet-400">
             <Icon className="w-5 h-5" />
           </div>
           <div>
@@ -265,9 +265,9 @@ export function TeachingTour({ topicName, onComplete }: TeachingTourProps) {
                 key={idx}
                 className={`w-2 h-2 rounded-full transition-colors ${
                   idx === currentStep
-                    ? 'bg-indigo-600'
+                    ? 'bg-violet-600'
                     : idx < currentStep
-                    ? 'bg-indigo-300'
+                    ? 'bg-violet-300'
                     : 'bg-gray-300 dark:bg-gray-600'
                 }`}
               />
@@ -285,7 +285,7 @@ export function TeachingTour({ topicName, onComplete }: TeachingTourProps) {
             )}
             <button
               onClick={() => (isLastStep ? onComplete() : setCurrentStep((s) => s + 1))}
-              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors flex items-center gap-1"
+              className="px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white text-sm font-medium rounded-lg transition-colors flex items-center gap-1"
             >
               {isLastStep ? 'Start Teaching' : 'Next'}
               {!isLastStep && <ChevronRight className="w-4 h-4" />}

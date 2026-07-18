@@ -76,7 +76,7 @@ function ChatToggle({ onClick, className }: { onClick: () => void; className: st
         type="button"
         onClick={onClick}
         aria-label="Open AI Student chat"
-        className={`pointer-events-auto absolute right-3 top-3 z-20 size-12 items-center justify-center rounded-full border border-zinc-700 bg-zinc-800 text-zinc-200 shadow-lg transition hover:bg-zinc-700 md:right-4 md:top-4 ${className}`}
+        className={`pointer-events-auto absolute right-3 top-3 z-20 size-12 items-center justify-center rounded-full border border-zinc-200 bg-white text-zinc-700 shadow-lg transition hover:bg-zinc-100 md:right-4 md:top-4 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700 ${className}`}
       >
         <MessageCircle className="size-6" />
       </button>
@@ -112,11 +112,11 @@ function ChatSurface({
     <section
       ref={panelRef}
       style={style}
-      className={`pointer-events-auto absolute right-3 top-3 z-20 h-[290px] flex-col overflow-hidden rounded-lg border border-zinc-700 bg-zinc-800 text-white shadow-xl md:right-4 md:top-4 md:h-[var(--demo-panel-height)] ${className}`}
+      className={`pointer-events-auto absolute right-3 top-3 z-20 h-[290px] flex-col overflow-hidden rounded-lg border border-zinc-200 bg-white text-zinc-950 shadow-xl md:right-4 md:top-4 md:h-[var(--demo-panel-height)] dark:border-zinc-700 dark:bg-zinc-800 dark:text-white ${className}`}
     >
       <header
         {...dragHandleProps}
-        className="flex h-11 shrink-0 touch-none select-none items-center justify-between border-b border-zinc-700 bg-zinc-900/60 px-4 md:cursor-grab md:active:cursor-grabbing"
+        className="flex h-11 shrink-0 touch-none select-none items-center justify-between border-b border-zinc-200 bg-zinc-100/80 px-4 md:cursor-grab md:active:cursor-grabbing dark:border-zinc-700 dark:bg-zinc-900/60"
       >
         <h2 className="text-sm font-semibold">AI Student</h2>
         <div className="flex items-center gap-2">
@@ -128,7 +128,7 @@ function ChatSurface({
             onClick={onClose}
             onPointerDown={(event) => event.stopPropagation()}
             aria-label="Collapse AI Student chat"
-            className="rounded p-1 text-zinc-400 transition hover:bg-zinc-700 hover:text-white"
+            className="rounded p-1 text-zinc-500 transition hover:bg-zinc-200 hover:text-zinc-950 dark:text-zinc-400 dark:hover:bg-zinc-700 dark:hover:text-white"
           >
             <ChevronDown className="size-4" />
           </button>
@@ -146,7 +146,7 @@ function ChatSurface({
 
         {aiResponse && <MessageBubble role="ai" content={aiResponse} streaming={status === 'submitting'} />}
 
-        {notice && <p className="px-1 pt-1 text-[11px] leading-4 text-zinc-400">{notice}</p>}
+        {notice && <p className="px-1 pt-1 text-[11px] leading-4 text-zinc-500 dark:text-zinc-400">{notice}</p>}
       </div>
       <button
         type="button"
@@ -172,13 +172,13 @@ function MessageBubble({
   const isUser = role === 'user';
 
   return (
-    <div className={`rounded-lg p-2 ${isUser ? 'ml-4 bg-blue-900/20' : 'mr-4 bg-zinc-700'}`}>
-      <span className={`text-xs font-medium ${isUser ? 'text-blue-400' : 'text-green-400'}`}>
+    <div className={`rounded-lg p-2 ${isUser ? 'ml-4 bg-violet-100 dark:bg-violet-900/20' : 'mr-4 bg-zinc-100 dark:bg-zinc-700'}`}>
+      <span className={`text-xs font-medium ${isUser ? 'text-violet-700 dark:text-violet-400' : 'text-green-700 dark:text-green-400'}`}>
         {isUser ? 'You' : 'AI'}
       </span>
-      <p className="mt-1 whitespace-pre-wrap text-sm leading-5 text-white">
+      <p className="mt-1 whitespace-pre-wrap text-sm leading-5 text-zinc-950 dark:text-white">
         {content}
-        {streaming && <span className="ml-0.5 inline-block h-3 w-1 animate-pulse bg-blue-500" />}
+        {streaming && <span className="ml-0.5 inline-block h-3 w-1 animate-pulse bg-violet-500" />}
       </p>
     </div>
   );
@@ -186,9 +186,9 @@ function MessageBubble({
 
 function ThinkingBubble() {
   return (
-    <div className="mr-4 rounded-lg bg-zinc-700 p-2">
-      <span className="text-xs font-medium text-green-400">AI</span>
-      <div className="mt-1 flex items-center gap-2 text-sm text-zinc-300">
+    <div className="mr-4 rounded-lg bg-zinc-100 p-2 dark:bg-zinc-700">
+      <span className="text-xs font-medium text-green-700 dark:text-green-400">AI</span>
+      <div className="mt-1 flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-300">
         <span className="italic">Thinking</span>
         <span className="flex gap-1" aria-hidden="true">
           <span className="size-1.5 animate-bounce rounded-full bg-zinc-400" />

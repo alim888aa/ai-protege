@@ -94,7 +94,7 @@ export function InputPanel({
           <button
             onClick={onSubmit}
             disabled={isSubmitting || !value.trim()}
-            className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white text-sm font-medium rounded-md transition-colors"
+            className="px-4 py-1.5 bg-violet-600 hover:bg-violet-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white text-sm font-medium rounded-md transition-colors"
           >
             {isSubmitting ? 'Sending...' : 'Send'}
           </button>

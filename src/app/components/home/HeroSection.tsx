@@ -15,19 +15,19 @@ export function HeroSection() {
 
       <div className="mx-auto w-full max-w-[1440px] px-5 pb-10 pt-14 md:px-8 md:pb-14 md:pt-24 lg:px-10">
         <div className="max-w-5xl">
-          <p className="mb-5 flex items-center gap-3 text-xs font-bold tracking-[0.18em] text-violet-300 md:text-sm">
-            <span className="h-px w-9 bg-violet-400" />
+          <p className="mb-5 flex items-center gap-3 text-xs font-bold tracking-[0.18em] text-violet-700 md:text-sm dark:text-violet-300">
+            <span className="h-px w-9 bg-violet-600 dark:bg-violet-400" />
             LEARN BY TEACHING
           </p>
-          <h1 className="max-w-4xl text-[clamp(3.25rem,7.4vw,7.5rem)] font-semibold leading-[0.91] tracking-[-0.065em] text-white">
+          <h1 className="max-w-4xl text-[clamp(3.25rem,7.4vw,7.5rem)] font-semibold leading-[0.91] tracking-[-0.065em] text-zinc-950 dark:text-white">
             Think you know it?
-            <span className="block text-violet-300">Try teaching it.</span>
+            <span className="block text-violet-700 dark:text-violet-300">Try teaching it.</span>
           </h1>
 
           <div className="mt-8 flex max-w-4xl pt-7">
             <a
               href="#try-the-canvas"
-              className="inline-flex min-h-12 w-fit items-center gap-2 rounded-full border border-white/15 bg-white/5 px-5 text-sm font-semibold text-white transition hover:border-violet-300 hover:bg-white/10"
+              className="inline-flex min-h-12 w-fit items-center gap-2 rounded-full border border-zinc-300 bg-white px-5 text-sm font-semibold text-zinc-950 transition hover:border-violet-500 hover:bg-violet-50 dark:border-white/15 dark:bg-white/5 dark:text-white dark:hover:border-violet-300 dark:hover:bg-white/10"
             >
               Try the sample lesson
               <ArrowDown className="size-4" />

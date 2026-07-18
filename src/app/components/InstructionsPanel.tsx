@@ -26,10 +26,10 @@ export function InstructionsPanel() {
         ))}
       </ul>
       <div
-        className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-800 animate-fadeIn"
+        className="mt-4 p-3 bg-violet-50 dark:bg-violet-900/20 rounded-lg border border-violet-100 dark:border-violet-800 animate-fadeIn"
         style={{ animationDelay: '0.4s' }}
       >
-        <p className="text-xs text-blue-700 dark:text-blue-300 flex items-start gap-1.5">
+        <p className="text-xs text-violet-700 dark:text-violet-300 flex items-start gap-1.5">
           <Lightbulb className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
           <span>
             <strong>Tip:</strong> Click &quot;Done Explaining&quot; when ready, and the AI student will ask you

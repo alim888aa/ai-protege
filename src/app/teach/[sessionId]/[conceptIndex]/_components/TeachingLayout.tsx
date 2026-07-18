@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useSyncExternalStore } from 'react';
-import { useSystemTheme } from '@/app/hooks/useSystemTheme';
+import { useTheme } from '@/app/theme';
 import { ExcalidrawWrapper } from '@/app/components/ExcalidrawWrapper';
 import { OverlayContainer } from './OverlayContainer';
 import { InputPanel } from './InputPanel';
@@ -66,7 +66,7 @@ export function TeachingLayout({
   dialogues,
   explanations,
 }: TeachingLayoutProps) {
-  const theme = useSystemTheme();
+  const theme = useTheme();
   const { state, actions } = useTeachingReducer();
 
   // Show welcome screen only for brand new sessions (no existing dialogue or explanation)

@@ -63,7 +63,7 @@ export function FeedbackSection({ feedback }: FeedbackSectionProps) {
         {/* Missing Concepts */}
         {feedback.missingConcepts.length > 0 && (
           <div>
-            <h3 className="text-lg font-semibold text-blue-600 dark:text-blue-400 mb-3 flex items-center">
+            <h3 className="text-lg font-semibold text-violet-600 dark:text-violet-400 mb-3 flex items-center">
               <span className="mr-2">📝</span>
               Missing Concepts
             </h3>
@@ -71,7 +71,7 @@ export function FeedbackSection({ feedback }: FeedbackSectionProps) {
               {feedback.missingConcepts.map((concept, idx) => (
                 <li
                   key={idx}
-                  className="text-gray-700 dark:text-gray-300 pl-4 border-l-4 border-blue-400 py-2"
+                  className="text-gray-700 dark:text-gray-300 pl-4 border-l-4 border-violet-400 py-2"
                 >
                   {concept}
                 </li>

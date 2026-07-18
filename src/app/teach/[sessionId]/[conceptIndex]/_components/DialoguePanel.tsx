@@ -79,7 +79,7 @@ function MessageBubble({ message, index }: { message: Message; index: number }) 
     <div
       className={`p-4 rounded-lg transition-all duration-300 ${
         isUser
-          ? 'bg-blue-50 dark:bg-blue-900/20 ml-8 dialogue-message-user'
+          ? 'bg-violet-50 dark:bg-violet-900/20 ml-8 dialogue-message-user'
           : 'bg-gray-100 dark:bg-zinc-700 mr-8 dialogue-message'
       } ${isVisible ? 'opacity-100' : 'opacity-0'}`}
       style={{
@@ -87,7 +87,7 @@ function MessageBubble({ message, index }: { message: Message; index: number }) 
       }}
     >
       <div className="flex items-center gap-2 mb-1">
-        <span className={`w-2 h-2 rounded-full ${isUser ? 'bg-blue-500' : 'bg-green-500'}`} />
+        <span className={`w-2 h-2 rounded-full ${isUser ? 'bg-violet-500' : 'bg-green-500'}`} />
         <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
           {isUser ? 'You' : 'AI Student'}
         </span>
@@ -111,7 +111,7 @@ function StreamingMessage({ content }: { content: string }) {
       </div>
       <div className="text-sm text-gray-900 dark:text-white whitespace-pre-wrap leading-relaxed">
         {content}
-        <span className="inline-block w-2 h-4 ml-1 bg-blue-500 rounded-sm animate-pulse" />
+        <span className="inline-block w-2 h-4 ml-1 bg-violet-500 rounded-sm animate-pulse" />
       </div>
     </div>
   );

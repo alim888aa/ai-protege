@@ -79,24 +79,24 @@ export function SourceSelectionStep({
             disabled={isProcessing}
             className={`relative flex flex-col items-center p-3 rounded-xl border-2 transition-all duration-200 ${
               sourceType === 'url'
-                ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30 shadow-md'
-                : 'border-gray-200 dark:border-gray-600 bg-white dark:bg-zinc-700 hover:border-blue-300 dark:hover:border-blue-500'
+                ? 'border-violet-500 bg-violet-50 dark:bg-violet-900/30 shadow-md'
+                : 'border-gray-200 dark:border-gray-600 bg-white dark:bg-zinc-700 hover:border-violet-300 dark:hover:border-violet-500'
             } ${isProcessing ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
           >
             {sourceType === 'url' && (
               <div className="absolute top-1 right-1">
-                <CheckCircle2 className="w-4 h-4 text-blue-500" />
+                <CheckCircle2 className="w-4 h-4 text-violet-500" />
               </div>
             )}
             <div
-              className={`p-1.5 rounded-lg mb-1 ${sourceType === 'url' ? 'bg-blue-100 dark:bg-blue-800' : 'bg-gray-100 dark:bg-zinc-600'}`}
+              className={`p-1.5 rounded-lg mb-1 ${sourceType === 'url' ? 'bg-violet-100 dark:bg-violet-800' : 'bg-gray-100 dark:bg-zinc-600'}`}
             >
               <Globe
-                className={`w-5 h-5 ${sourceType === 'url' ? 'text-blue-600 dark:text-blue-300' : 'text-gray-500 dark:text-gray-400'}`}
+                className={`w-5 h-5 ${sourceType === 'url' ? 'text-violet-600 dark:text-violet-300' : 'text-gray-500 dark:text-gray-400'}`}
               />
             </div>
             <span
-              className={`text-xs font-medium ${sourceType === 'url' ? 'text-blue-700 dark:text-blue-300' : 'text-gray-700 dark:text-gray-300'}`}
+              className={`text-xs font-medium ${sourceType === 'url' ? 'text-violet-700 dark:text-violet-300' : 'text-gray-700 dark:text-gray-300'}`}
             >
               Web URL
             </span>
@@ -112,24 +112,24 @@ export function SourceSelectionStep({
             disabled={isProcessing}
             className={`relative flex flex-col items-center p-3 rounded-xl border-2 transition-all duration-200 ${
               sourceType === 'pdf'
-                ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30 shadow-md'
-                : 'border-gray-200 dark:border-gray-600 bg-white dark:bg-zinc-700 hover:border-blue-300 dark:hover:border-blue-500'
+                ? 'border-violet-500 bg-violet-50 dark:bg-violet-900/30 shadow-md'
+                : 'border-gray-200 dark:border-gray-600 bg-white dark:bg-zinc-700 hover:border-violet-300 dark:hover:border-violet-500'
             } ${isProcessing ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
           >
             {sourceType === 'pdf' && (
               <div className="absolute top-1 right-1">
-                <CheckCircle2 className="w-4 h-4 text-blue-500" />
+                <CheckCircle2 className="w-4 h-4 text-violet-500" />
               </div>
             )}
             <div
-              className={`p-1.5 rounded-lg mb-1 ${sourceType === 'pdf' ? 'bg-blue-100 dark:bg-blue-800' : 'bg-gray-100 dark:bg-zinc-600'}`}
+              className={`p-1.5 rounded-lg mb-1 ${sourceType === 'pdf' ? 'bg-violet-100 dark:bg-violet-800' : 'bg-gray-100 dark:bg-zinc-600'}`}
             >
               <FileText
-                className={`w-5 h-5 ${sourceType === 'pdf' ? 'text-blue-600 dark:text-blue-300' : 'text-gray-500 dark:text-gray-400'}`}
+                className={`w-5 h-5 ${sourceType === 'pdf' ? 'text-violet-600 dark:text-violet-300' : 'text-gray-500 dark:text-gray-400'}`}
               />
             </div>
             <span
-              className={`text-xs font-medium ${sourceType === 'pdf' ? 'text-blue-700 dark:text-blue-300' : 'text-gray-700 dark:text-gray-300'}`}
+              className={`text-xs font-medium ${sourceType === 'pdf' ? 'text-violet-700 dark:text-violet-300' : 'text-gray-700 dark:text-gray-300'}`}
             >
               PDF
             </span>
@@ -145,24 +145,24 @@ export function SourceSelectionStep({
             disabled={isProcessing}
             className={`relative flex flex-col items-center p-3 rounded-xl border-2 transition-all duration-200 ${
               sourceType === 'none'
-                ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30 shadow-md'
-                : 'border-gray-200 dark:border-gray-600 bg-white dark:bg-zinc-700 hover:border-blue-300 dark:hover:border-blue-500'
+                ? 'border-violet-500 bg-violet-50 dark:bg-violet-900/30 shadow-md'
+                : 'border-gray-200 dark:border-gray-600 bg-white dark:bg-zinc-700 hover:border-violet-300 dark:hover:border-violet-500'
             } ${isProcessing ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
           >
             {sourceType === 'none' && (
               <div className="absolute top-1 right-1">
-                <CheckCircle2 className="w-4 h-4 text-blue-500" />
+                <CheckCircle2 className="w-4 h-4 text-violet-500" />
               </div>
             )}
             <div
-              className={`p-1.5 rounded-lg mb-1 ${sourceType === 'none' ? 'bg-blue-100 dark:bg-blue-800' : 'bg-gray-100 dark:bg-zinc-600'}`}
+              className={`p-1.5 rounded-lg mb-1 ${sourceType === 'none' ? 'bg-violet-100 dark:bg-violet-800' : 'bg-gray-100 dark:bg-zinc-600'}`}
             >
               <PenLine
-                className={`w-5 h-5 ${sourceType === 'none' ? 'text-blue-600 dark:text-blue-300' : 'text-gray-500 dark:text-gray-400'}`}
+                className={`w-5 h-5 ${sourceType === 'none' ? 'text-violet-600 dark:text-violet-300' : 'text-gray-500 dark:text-gray-400'}`}
               />
             </div>
             <span
-              className={`text-xs font-medium ${sourceType === 'none' ? 'text-blue-700 dark:text-blue-300' : 'text-gray-700 dark:text-gray-300'}`}
+              className={`text-xs font-medium ${sourceType === 'none' ? 'text-violet-700 dark:text-violet-300' : 'text-gray-700 dark:text-gray-300'}`}
             >
               Manual
             </span>
@@ -178,7 +178,7 @@ export function SourceSelectionStep({
               onChange={(e) => setSourceUrl(e.target.value)}
               placeholder="https://example.com/article"
               disabled={isProcessing}
-              className="w-4/5 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-zinc-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="w-4/5 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-zinc-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-violet-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             />
           </div>
         )}
@@ -190,8 +190,8 @@ export function SourceSelectionStep({
               onClick={() => !isProcessing && fileInputRef.current?.click()}
               className={`w-4/5 px-3 py-3 border-2 border-dashed rounded-lg text-center cursor-pointer transition-colors ${
                 pdfFile
-                  ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                  : 'border-gray-300 dark:border-gray-600 hover:border-blue-400 dark:hover:border-blue-500'
+                  ? 'border-violet-500 bg-violet-50 dark:bg-violet-900/20'
+                  : 'border-gray-300 dark:border-gray-600 hover:border-violet-400 dark:hover:border-violet-500'
               } ${isProcessing ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               <input
@@ -203,7 +203,7 @@ export function SourceSelectionStep({
                 className="hidden"
               />
               {pdfFile ? (
-                <div className="flex items-center justify-center gap-2 text-blue-600 dark:text-blue-400 text-sm">
+                <div className="flex items-center justify-center gap-2 text-violet-600 dark:text-violet-400 text-sm">
                   <FileText className="w-5 h-5" />
                   <span className="font-medium truncate max-w-[150px]">{pdfFile.name}</span>
                 </div>
@@ -252,7 +252,7 @@ export function SourceSelectionStep({
           type="button"
           onClick={onStart}
           disabled={isStartDisabled}
-          className="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium text-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed"
+          className="px-6 py-2 bg-violet-600 text-white rounded-lg font-medium text-sm hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 transition-all duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
           {isProcessing ? (
             <span className="flex items-center gap-2">

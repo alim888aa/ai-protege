@@ -5,7 +5,7 @@ interface ErrorStateProps {
 
 export function ErrorState({ error, onBackToDashboard }: ErrorStateProps) {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-zinc-900 dark:to-zinc-800">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-violet-50 to-violet-100 dark:from-zinc-900 dark:to-zinc-800">
       <div className="text-center max-w-md mx-auto px-6">
         <div className="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
           <svg className="w-8 h-8 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -20,7 +20,7 @@ export function ErrorState({ error, onBackToDashboard }: ErrorStateProps) {
         </p>
         <button
           onClick={onBackToDashboard}
-          className="px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+          className="px-6 py-3 bg-violet-600 text-white rounded-lg font-semibold hover:bg-violet-700 transition-colors"
         >
           Back to Dashboard
         </button>

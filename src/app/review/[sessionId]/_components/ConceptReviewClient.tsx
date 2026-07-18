@@ -32,12 +32,12 @@ export function ConceptReviewClient({ sessionId }: ConceptReviewClientProps) {
 
   if (sourceMaterial === null) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-zinc-900 dark:to-zinc-800">
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-violet-50 to-violet-100 dark:from-zinc-900 dark:to-zinc-800">
         <div className="text-center">
           <p className="mb-4 text-gray-600 dark:text-gray-400">Session not found.</p>
           <Link
             href="/"
-            className="rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white transition-colors hover:bg-blue-700"
+            className="rounded-lg bg-violet-600 px-6 py-3 font-semibold text-white transition-colors hover:bg-violet-700"
           >
             Back to Setup
           </Link>
@@ -196,7 +196,7 @@ function ConceptReviewEditor({
   const isManualMode = sourceMaterial.sourceType === 'none' || !sourceMaterial.sourceType;
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-zinc-900 dark:to-zinc-800">
+    <div className="flex min-h-screen bg-gradient-to-br from-violet-50 to-violet-100 dark:from-zinc-900 dark:to-zinc-800">
       <div className="w-full max-w-4xl mx-auto px-6 py-16">
         <div className="bg-white dark:bg-zinc-800 rounded-2xl shadow-xl p-8">
           {/* Header */}
@@ -243,7 +243,7 @@ function ConceptReviewEditor({
             <button
               onClick={handleAddConcept}
               disabled={concepts.length >= 10}
-              className="w-full px-6 py-3 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-400 hover:border-blue-500 hover:text-blue-600 dark:hover:border-blue-500 dark:hover:text-blue-400 disabled:border-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors font-medium"
+              className="w-full px-6 py-3 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-400 hover:border-violet-500 hover:text-violet-600 dark:hover:border-violet-500 dark:hover:text-violet-400 disabled:border-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors font-medium"
             >
               {concepts.length >= 10 ? 'Maximum concepts reached (10)' : '+ Add Concept'}
             </button>
@@ -263,7 +263,7 @@ function ConceptReviewEditor({
             <button
               onClick={handleStartTeaching}
               disabled={isSaving || concepts.length === 0}
-              className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-400 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl btn-press focus-ring-smooth"
+              className="flex-1 px-6 py-3 bg-violet-600 text-white rounded-lg font-semibold hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 disabled:bg-gray-400 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl btn-press focus-ring-smooth"
             >
               {isSaving ? (
                 <span className="flex items-center justify-center gap-2">

@@ -95,7 +95,7 @@ function ProcessingModal({ isOpen, message }: { isOpen: boolean; message: string
       <div className="bg-white dark:bg-zinc-800 rounded-2xl shadow-2xl p-8 max-w-md mx-4 text-center">
         <div className="flex justify-center mb-4">
           <svg
-            className="animate-spin h-12 w-12 text-blue-500"
+            className="animate-spin h-12 w-12 text-violet-500"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"

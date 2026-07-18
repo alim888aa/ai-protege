@@ -1,6 +1,6 @@
 export function ReviewLoadingSkeleton() {
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-zinc-900 dark:to-zinc-800">
+    <div className="flex min-h-screen bg-gradient-to-br from-violet-50 to-violet-100 dark:from-zinc-900 dark:to-zinc-800">
       <div className="w-full max-w-4xl mx-auto px-6 py-16">
         <div className="bg-white dark:bg-zinc-800 rounded-2xl shadow-xl p-8 animate-fadeIn">
           {/* Header Skeleton */}

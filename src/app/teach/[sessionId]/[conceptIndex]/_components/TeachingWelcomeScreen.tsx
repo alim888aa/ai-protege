@@ -56,22 +56,22 @@ export function TeachingWelcomeScreen({ topicName, onDismiss }: TeachingWelcomeS
         `}</style>
         {/* Header */}
         <div className="flex flex-col items-center gap-3 mb-6">
-          <div className="p-3 bg-indigo-100 dark:bg-indigo-900/30 rounded-full">
-            <GraduationCap className="w-10 h-10 text-indigo-600 dark:text-indigo-400" />
+          <div className="p-3 bg-violet-100 dark:bg-violet-900/30 rounded-full">
+            <GraduationCap className="w-10 h-10 text-violet-600 dark:text-violet-400" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white text-center">
             Welcome to the Teaching Canvas
           </h1>
           <p className="text-gray-600 dark:text-gray-300 text-center">
-            Teach <span className="font-semibold text-indigo-600 dark:text-indigo-400">&quot;{topicName}&quot;</span> by drawing and explaining
+            Teach <span className="font-semibold text-violet-600 dark:text-violet-400">&quot;{topicName}&quot;</span> by drawing and explaining
           </p>
         </div>
 
         {/* Instructions */}
         <div className="space-y-3 mb-8">
           <div className="flex items-start gap-4 p-3 rounded-xl bg-gray-50 dark:bg-zinc-700/50">
-            <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-              <PenTool className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            <div className="p-2 bg-violet-100 dark:bg-violet-900/30 rounded-lg">
+              <PenTool className="w-5 h-5 text-violet-600 dark:text-violet-400" />
             </div>
             <div>
               <h3 className="font-medium text-gray-900 dark:text-white">Draw diagrams</h3>
@@ -109,7 +109,7 @@ export function TeachingWelcomeScreen({ topicName, onDismiss }: TeachingWelcomeS
         {/* CTA */}
         <button
           onClick={onDismiss}
-          className="w-full py-3 px-6 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-xl transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-zinc-800 flex items-center justify-center gap-2"
+          className="w-full py-3 px-6 bg-violet-600 hover:bg-violet-700 text-white font-medium rounded-xl transition-colors focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 dark:focus:ring-offset-zinc-800 flex items-center justify-center gap-2"
         >
           <Sparkles className="w-5 h-5" />
           Start Teaching

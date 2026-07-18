@@ -8,6 +8,7 @@ import { exportFullCanvasForAI } from '@/app/utils/excalidrawExport';
 import { LandingDemoChatPanel } from './LandingDemoChatPanel';
 import { LandingDemoInputPanel } from './LandingDemoInputPanel';
 import { getLandingDemoAppState, landingDemoScene } from './landingDemoScene';
+import { useTheme } from '@/app/theme';
 
 type DemoStatus = 'idle' | 'submitting' | 'complete';
 
@@ -72,6 +73,7 @@ function wait(duration: number) {
 }
 
 export function LandingCanvasDemo({ ctaHref }: LandingCanvasDemoProps) {
+  const theme = useTheme();
   const [explanation, setExplanation] = useState(starterExplanation);
   const [submittedExplanation, setSubmittedExplanation] = useState('');
   const [aiResponse, setAiResponse] = useState('');
@@ -232,7 +234,7 @@ export function LandingCanvasDemo({ ctaHref }: LandingCanvasDemoProps) {
     <article
       id="try-the-canvas"
       aria-label="Interactive stack data structure lesson"
-      className="landing-demo-window relative mx-auto h-[720px] w-full max-w-[1380px] overflow-hidden rounded-[22px] border border-zinc-800 bg-[#121212] shadow-[0_28px_90px_-44px_rgba(15,23,42,0.75)] md:h-[760px]"
+      className="landing-demo-window relative mx-auto h-[720px] w-full max-w-[1380px] overflow-hidden rounded-[22px] border border-zinc-300 bg-white shadow-[0_28px_90px_-44px_rgba(15,23,42,0.45)] md:h-[760px] dark:border-zinc-800 dark:bg-[#121212] dark:shadow-[0_28px_90px_-44px_rgba(0,0,0,0.9)]"
     >
       <div
         ref={canvasContainerRef}
@@ -249,7 +251,7 @@ export function LandingCanvasDemo({ ctaHref }: LandingCanvasDemoProps) {
           onElementsChange={handleElementsChange}
           onApiReady={handleCanvasReady}
           onScrollChange={handleScrollChange}
-          theme="dark"
+          theme={theme}
           mode="demo"
         />
       </div>
@@ -273,17 +275,17 @@ export function LandingCanvasDemo({ ctaHref }: LandingCanvasDemoProps) {
           value={explanation}
         />
 
-        <div className="pointer-events-auto absolute bottom-4 right-4 hidden items-center gap-3 rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2.5 text-white shadow-xl md:flex">
+        <div className="pointer-events-auto absolute bottom-4 right-4 hidden items-center gap-3 rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-zinc-950 shadow-xl md:flex dark:border-zinc-700 dark:bg-zinc-800 dark:text-white">
           <button
             type="button"
             onClick={resetDemo}
-            className="rounded-md p-2 text-zinc-400 transition hover:bg-zinc-700 hover:text-white"
+            className="rounded-md p-2 text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-950 dark:text-zinc-400 dark:hover:bg-zinc-700 dark:hover:text-white"
             aria-label="Reset demo"
             title="Reset demo"
           >
             <RotateCcw className="size-5" />
           </button>
-          <div className="h-8 w-px bg-zinc-600" />
+          <div className="h-8 w-px bg-zinc-200 dark:bg-zinc-600" />
           <div className="min-w-36">
             <p className="truncate text-sm font-medium">Stack Data Structure</p>
           </div>

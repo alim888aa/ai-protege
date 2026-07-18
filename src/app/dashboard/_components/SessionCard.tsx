@@ -121,7 +121,7 @@ export function SessionCard({ session, onDelete }: SessionCardProps) {
       </p>
       
       {/* Progress */}
-      <p className={`text-sm mb-2 ${isEffectivelyComplete ? 'text-green-600 dark:text-green-400' : 'text-blue-600 dark:text-blue-400'}`}>
+      <p className={`text-sm mb-2 ${isEffectivelyComplete ? 'text-green-600 dark:text-green-400' : 'text-violet-600 dark:text-violet-400'}`}>
         {progressDisplay}
       </p>
       
@@ -142,7 +142,7 @@ export function SessionCard({ session, onDelete }: SessionCardProps) {
         ) : (
           <button
             onClick={() => router.push(`/teach/${sessionId}/${currentConceptIndex}`)}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+            className="px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white text-sm font-medium rounded-lg transition-colors"
           >
             Continue
           </button>

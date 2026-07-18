@@ -4,47 +4,54 @@ import { ClerkProvider, useAuth } from "@clerk/nextjs";
 import { ConvexProviderWithClerk } from "convex/react-clerk";
 import { ConvexReactClient } from "convex/react";
 import { ReactNode } from "react";
+import { type Theme, useTheme } from "./theme";
 
 const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
-const clerkAppearance = {
-  variables: {
-    colorPrimary: "#2563eb",
-    colorTextOnPrimaryBackground: "#ffffff",
-    colorBackground: "#f3f4f6",
-    colorInputBackground: "#ffffff",
-    colorInputText: "#111827",
-    colorText: "#111827",
-    colorTextSecondary: "#4b5563",
-    borderRadius: "0.75rem",
-    fontFamily: "var(--font-geist-sans), system-ui, sans-serif",
-  },
-  elements: {
-    card: "shadow-2xl shadow-gray-400/30 border border-gray-200/50 bg-gray-100",
-    headerTitle: "text-gray-900 font-bold",
-    headerSubtitle: "text-gray-600",
-    socialButtonsBlockButton:
-      "border border-gray-300 bg-white hover:bg-gray-50 transition-all duration-200 shadow-sm",
-    socialButtonsBlockButtonText: "text-gray-700 font-medium",
-    formButtonPrimary:
-      "bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl",
-    formFieldInput:
-      "border-gray-300 bg-white focus:border-blue-500 focus:ring-blue-500",
-    formFieldLabel: "text-gray-700 font-medium",
-    footerActionLink: "text-blue-600 hover:text-blue-700 font-medium",
-    identityPreviewEditButton: "text-blue-600 hover:text-blue-700",
-    userButtonPopoverCard:
-      "shadow-2xl shadow-gray-400/30 border border-gray-200/50 bg-gray-100",
-    userButtonPopoverActionButton: "hover:bg-gray-200",
-    userButtonPopoverActionButtonText: "text-gray-700",
-    userButtonPopoverFooter: "border-t border-gray-200",
-    avatarBox: "ring-2 ring-blue-500/20",
-  },
-};
+function getClerkAppearance(theme: Theme) {
+  const dark = theme === "dark";
+
+  return {
+    variables: {
+      colorPrimary: dark ? "#8b5cf6" : "#6d4aff",
+      colorTextOnPrimaryBackground: "#ffffff",
+      colorBackground: dark ? "#18181b" : "#ffffff",
+      colorInputBackground: dark ? "#27272a" : "#f4f4f5",
+      colorInputText: dark ? "#f4f4f5" : "#18181b",
+      colorText: dark ? "#f4f4f5" : "#18181b",
+      colorTextSecondary: dark ? "#a1a1aa" : "#52525b",
+      borderRadius: "0.75rem",
+      fontFamily: "var(--font-geist-sans), system-ui, sans-serif",
+    },
+    elements: {
+      card: "border border-zinc-200 bg-white shadow-2xl shadow-zinc-300/30 dark:border-zinc-800 dark:bg-zinc-900 dark:shadow-black/40",
+      headerTitle: "font-bold text-zinc-950 dark:text-zinc-50",
+      headerSubtitle: "text-zinc-600 dark:text-zinc-400",
+      socialButtonsBlockButton:
+        "border border-zinc-300 bg-white shadow-sm transition hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:hover:bg-zinc-700",
+      socialButtonsBlockButtonText: "font-medium text-zinc-700 dark:text-zinc-200",
+      formButtonPrimary:
+        "bg-violet-600 shadow-lg transition hover:bg-violet-700 hover:shadow-xl dark:bg-violet-500 dark:hover:bg-violet-400",
+      formFieldInput:
+        "border-zinc-300 bg-white text-zinc-950 focus:border-violet-500 focus:ring-violet-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50",
+      formFieldLabel: "font-medium text-zinc-700 dark:text-zinc-300",
+      footerActionLink: "font-medium text-violet-700 hover:text-violet-800 dark:text-violet-300 dark:hover:text-violet-200",
+      identityPreviewEditButton: "text-violet-700 hover:text-violet-800 dark:text-violet-300 dark:hover:text-violet-200",
+      userButtonPopoverCard:
+        "border border-zinc-200 bg-white shadow-2xl shadow-zinc-300/30 dark:border-zinc-800 dark:bg-zinc-900 dark:shadow-black/40",
+      userButtonPopoverActionButton: "hover:bg-zinc-100 dark:hover:bg-zinc-800",
+      userButtonPopoverActionButtonText: "text-zinc-700 dark:text-zinc-200",
+      userButtonPopoverFooter: "border-t border-zinc-200 dark:border-zinc-800",
+      avatarBox: "ring-2 ring-violet-500/25",
+    },
+  };
+}
 
 export function Providers({ children }: { children: ReactNode }) {
+  const theme = useTheme();
+
   return (
-    <ClerkProvider appearance={clerkAppearance}>
+    <ClerkProvider appearance={getClerkAppearance(theme)}>
       <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
         {children}
       </ConvexProviderWithClerk>

@@ -23,7 +23,7 @@ export function ConceptCard({
 }: ConceptCardProps) {
   return (
     <div
-      className="border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:border-blue-300 dark:hover:border-blue-700 transition-all duration-200 card-hover animate-fadeIn"
+      className="border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:border-violet-300 dark:hover:border-violet-700 transition-all duration-200 card-hover animate-fadeIn"
       style={{ animationDelay: `${index * 0.05}s` }}
     >
       <div className="flex items-start justify-between mb-4">
@@ -35,7 +35,7 @@ export function ConceptCard({
             type="text"
             value={concept.title}
             onChange={(e) => onTitleChange(concept.id, e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors"
             placeholder="Enter concept title"
           />
         </div>
@@ -68,7 +68,7 @@ export function ConceptCard({
           value={concept.description}
           onChange={(e) => onDescriptionChange(concept.id, e.target.value)}
           rows={3}
-          className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-none"
+          className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors resize-none"
           placeholder="Describe this concept in 1-2 sentences"
         />
       </div>

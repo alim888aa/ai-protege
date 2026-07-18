@@ -22,8 +22,6 @@ The repo is canonical for implementation.
 
 Use `docs/` for durable project memory, plans, ADRs, and progress notes.
 
-Use `.kiro/specs/` as historical implementation context. Do not treat old Kiro specs as current requirements unless the user confirms they still apply.
-
 When meaningful progress happens, update the relevant docs before finishing the task.
 
 Delete or rewrite docs that are clearly stale instead of preserving confusion.

@@ -151,12 +151,12 @@ export function DialogueInput({
           placeholder="Type your response... (Press Enter to send)"
           disabled={isStreamingResponse}
           rows={1}
-          className="flex-1 px-4 py-2 border border-gray-300 dark:border-zinc-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-zinc-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 disabled:bg-gray-100 dark:disabled:bg-zinc-800 disabled:cursor-not-allowed resize-none overflow-hidden min-h-[40px] max-h-[200px] transition-all duration-200 focus-ring-smooth"
+          className="flex-1 px-4 py-2 border border-gray-300 dark:border-zinc-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 bg-white dark:bg-zinc-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 disabled:bg-gray-100 dark:disabled:bg-zinc-800 disabled:cursor-not-allowed resize-none overflow-hidden min-h-[40px] max-h-[200px] transition-all duration-200 focus-ring-smooth"
         />
         <button
           onClick={handleSend}
           disabled={!dialogueInput.trim() || isStreamingResponse}
-          className="px-6 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-400 disabled:cursor-not-allowed transition-all duration-200 btn-press focus-ring-smooth"
+          className="px-6 py-2 bg-violet-600 text-white rounded-lg font-semibold hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 disabled:bg-gray-400 disabled:cursor-not-allowed transition-all duration-200 btn-press focus-ring-smooth"
         >
           {isStreamingResponse ? (
             <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">

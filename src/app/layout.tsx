@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
-import { Analytics } from "@vercel/analytics/next"
+import { Analytics } from "@vercel/analytics/next";
+
+const initialThemeScript = `try{var saved=localStorage.getItem('ai-protege-theme');var theme=saved==='light'?'light':'dark';document.documentElement.classList.add(theme);document.documentElement.style.colorScheme=theme}catch(e){document.documentElement.classList.add('dark')}`;
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,7 +28,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script
+          id="initial-theme"
+          dangerouslySetInnerHTML={{ __html: initialThemeScript }}
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

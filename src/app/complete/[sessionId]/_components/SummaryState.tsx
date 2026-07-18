@@ -25,13 +25,13 @@ export function SummaryState({
   onBackToDashboard,
 }: SummaryStateProps) {
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-zinc-900 dark:to-zinc-800 page-transition">
+    <div className="flex min-h-screen bg-gradient-to-br from-violet-50 to-violet-100 dark:from-zinc-900 dark:to-zinc-800 page-transition">
       <div className="w-full max-w-4xl mx-auto px-6 py-16">
         <div className="bg-white dark:bg-zinc-800 rounded-2xl shadow-xl p-8 animate-fadeIn">
           {/* Header with AI Avatar */}
           <div className="flex items-center gap-4 mb-8">
-            <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
-              <svg className="w-8 h-8 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-16 h-16 bg-violet-100 dark:bg-violet-900/30 rounded-full flex items-center justify-center">
+              <svg className="w-8 h-8 text-violet-600 dark:text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
             </div>
@@ -49,7 +49,7 @@ export function SummaryState({
           {summary && (
             <div className="mb-8">
               <div className="prose prose-lg dark:prose-invert max-w-none">
-                <div className="p-6 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-100 dark:border-blue-800">
+                <div className="p-6 bg-violet-50 dark:bg-violet-900/20 rounded-xl border border-violet-100 dark:border-violet-800">
                   <p className="text-gray-800 dark:text-gray-200 whitespace-pre-wrap leading-relaxed">
                     {summary.summary}
                   </p>

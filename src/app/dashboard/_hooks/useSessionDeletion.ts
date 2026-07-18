@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import { useMutation } from 'convex/react';
 import { api } from '../../../../convex/_generated/api';
+import { clearSessionCache } from '@/app/utils/sessionCache';
 
 interface Session {
   sessionId: string;
@@ -20,16 +21,17 @@ export function useSessionDeletion(sessions: Session[] | undefined) {
     ? sessions?.find((s) => s.sessionId === sessionToDelete)?.topic ?? ''
     : '';
 
-  const handleDeleteClick = useCallback((sessionId: string) => {
+  function handleDeleteClick(sessionId: string) {
     setSessionToDelete(sessionId);
-  }, []);
+  }
 
-  const handleConfirmDelete = useCallback(async () => {
+  async function handleConfirmDelete() {
     if (!sessionToDelete) return;
 
     setIsDeleting(true);
     try {
       await deleteSessionMutation({ sessionId: sessionToDelete });
+      clearSessionCache(sessionToDelete);
       // Close dialog on success - UI updates automatically via Convex reactivity
       setSessionToDelete(null);
     } catch (err) {
@@ -38,13 +40,13 @@ export function useSessionDeletion(sessions: Session[] | undefined) {
     } finally {
       setIsDeleting(false);
     }
-  }, [sessionToDelete, deleteSessionMutation]);
+  }
 
-  const handleCancelDelete = useCallback(() => {
+  function handleCancelDelete() {
     if (!isDeleting) {
       setSessionToDelete(null);
     }
-  }, [isDeleting]);
+  }
 
   return {
     sessionToDelete,

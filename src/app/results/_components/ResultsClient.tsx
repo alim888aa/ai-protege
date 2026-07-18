@@ -52,7 +52,7 @@ export function ResultsClient() {
             <p className="text-gray-600 dark:text-gray-400 mb-6">{result.error}</p>
             <button
               onClick={handleStartNewSession}
-              className="px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+              className="px-6 py-3 bg-violet-600 text-white rounded-lg font-semibold hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 transition-colors"
             >
               Start New Session
             </button>
@@ -86,7 +86,7 @@ export function ResultsClient() {
         <div className="text-center">
           <button
             onClick={handleStartNewSession}
-            className="px-8 py-4 bg-blue-600 text-white rounded-lg font-semibold text-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors shadow-lg hover:shadow-xl"
+            className="px-8 py-4 bg-violet-600 text-white rounded-lg font-semibold text-lg hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 transition-colors shadow-lg hover:shadow-xl"
           >
             Start New Session
           </button>

@@ -1,8 +1,8 @@
 export function LoadingState() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-zinc-900 dark:to-zinc-800">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-violet-50 to-violet-100 dark:from-zinc-900 dark:to-zinc-800">
       <div className="text-center max-w-md mx-auto px-6">
-        <div className="animate-spin h-12 w-12 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-6"></div>
+        <div className="animate-spin h-12 w-12 border-4 border-violet-500 border-t-transparent rounded-full mx-auto mb-6"></div>
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
           Generating Summary...
         </h2>

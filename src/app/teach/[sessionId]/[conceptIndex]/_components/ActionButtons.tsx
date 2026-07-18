@@ -231,7 +231,7 @@ export function ActionButtons({
       <button
         onClick={handleDoneExplaining}
         disabled={isSubmitting || !textExplanation.trim()}
-        className="w-full px-6 py-4 bg-blue-600 text-white rounded-lg font-semibold text-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-400 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl btn-press focus-ring-smooth"
+        className="w-full px-6 py-4 bg-violet-600 text-white rounded-lg font-semibold text-lg hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 disabled:bg-gray-400 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl btn-press focus-ring-smooth"
       >
         {isSubmitting ? (
           <span className="flex items-center justify-center gap-2">

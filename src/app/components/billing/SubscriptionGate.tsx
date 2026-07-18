@@ -16,7 +16,7 @@ export function SubscriptionGate({ children, checkoutPending = false }: Subscrip
 
   if (entitlement === undefined) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#09090b] text-white">
+      <div className="flex min-h-screen items-center justify-center bg-zinc-50 text-zinc-950 dark:bg-[#09090b] dark:text-white">
         <LoaderCircle className="h-7 w-7 animate-spin" aria-label="Checking subscription" />
       </div>
     );
@@ -28,16 +28,16 @@ export function SubscriptionGate({ children, checkoutPending = false }: Subscrip
 
   if (checkoutPending) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-[#09090b] px-5 text-white">
-        <div className="max-w-md rounded-[2rem] border border-white/12 bg-zinc-900 p-8 text-center sm:p-10">
-          <LoaderCircle className="mx-auto size-8 animate-spin text-violet-300" aria-hidden="true" />
+      <main className="flex min-h-screen items-center justify-center bg-zinc-50 px-5 text-zinc-950 dark:bg-[#09090b] dark:text-white">
+        <div className="max-w-md rounded-[2rem] border border-zinc-200 bg-white p-8 text-center sm:p-10 dark:border-white/12 dark:bg-zinc-900">
+          <LoaderCircle className="mx-auto size-8 animate-spin text-violet-700 dark:text-violet-300" aria-hidden="true" />
           <h1 className="mt-6 text-3xl font-semibold tracking-tight">Activating your membership</h1>
-          <p className="mt-4 leading-7 text-zinc-400">
+          <p className="mt-4 leading-7 text-zinc-600 dark:text-zinc-400">
             Polar confirmed your checkout. Access usually appears within a few seconds while the secure webhook finishes.
           </p>
           <a
             href="/dashboard?checkout=success"
-            className="mt-7 inline-flex min-h-11 items-center justify-center rounded-full bg-white px-6 text-sm font-bold text-zinc-950 transition hover:bg-violet-200"
+            className="mt-7 inline-flex min-h-11 items-center justify-center rounded-full bg-zinc-950 px-6 text-sm font-bold text-white transition hover:bg-violet-700 dark:bg-white dark:text-zinc-950 dark:hover:bg-violet-200"
           >
             Check again
           </a>
@@ -47,16 +47,16 @@ export function SubscriptionGate({ children, checkoutPending = false }: Subscrip
   }
 
   return (
-    <main className="min-h-screen bg-[#09090b] px-5 pb-20 pt-28 text-white">
+    <main className="min-h-screen bg-zinc-50 px-5 pb-20 pt-28 text-zinc-950 dark:bg-[#09090b] dark:text-white">
       <div className="mx-auto max-w-5xl">
         <div className="mb-10 max-w-2xl">
-          <p className="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-violet-300">
+          <p className="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-violet-700 dark:text-violet-300">
             AI Protégé membership
           </p>
           <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
             Teach without limits.
           </h1>
-          <p className="mt-4 text-lg leading-8 text-zinc-400">
+          <p className="mt-4 text-lg leading-8 text-zinc-600 dark:text-zinc-400">
             Draw, explain, ask for hints, and create as many learning sessions as you need.
             Every plan starts with seven free days.
           </p>

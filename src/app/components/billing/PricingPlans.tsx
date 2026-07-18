@@ -117,7 +117,7 @@ export function PricingPlans({ surface = 'page' }: PricingPlansProps) {
         <p
           role="alert"
           aria-live="polite"
-          className="mt-5 rounded-xl border border-red-300/30 bg-red-400/10 px-4 py-3 text-sm text-red-100"
+          className="mt-5 rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-300/30 dark:bg-red-400/10 dark:text-red-100"
         >
           {error}
         </p>
@@ -128,7 +128,7 @@ export function PricingPlans({ surface = 'page' }: PricingPlansProps) {
           type="button"
           onClick={openPortal}
           disabled={busy}
-          className="mt-5 text-sm font-semibold text-zinc-300 underline decoration-zinc-600 underline-offset-4 transition hover:text-white disabled:opacity-50"
+          className="mt-5 text-sm font-semibold text-zinc-700 underline decoration-zinc-400 underline-offset-4 transition hover:text-zinc-950 disabled:opacity-50 dark:text-zinc-300 dark:decoration-zinc-600 dark:hover:text-white"
         >
           {isOpeningPortal ? 'Opening billing…' : 'Manage an existing subscription'}
         </button>
@@ -169,7 +169,7 @@ function PlanCard({
       className={
         yearly
           ? 'relative flex min-h-[34rem] flex-col overflow-hidden rounded-[2rem] bg-violet-300 p-7 text-zinc-950 shadow-[0_24px_80px_-32px_rgba(196,181,253,0.7)] sm:p-9'
-          : 'flex min-h-[32rem] flex-col rounded-[2rem] border border-white/12 bg-zinc-900 p-7 text-white sm:p-9 lg:mt-8'
+          : 'flex min-h-[32rem] flex-col rounded-[2rem] border border-zinc-200 bg-white p-7 text-zinc-950 sm:p-9 lg:mt-8 dark:border-white/12 dark:bg-zinc-900 dark:text-white'
       }
     >
       {yearly && (
@@ -208,7 +208,7 @@ function PlanCard({
             <span className={yearly ? 'mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-zinc-950 text-violet-200' : 'mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-white text-zinc-950'}>
               <Check className="size-3" strokeWidth={3} />
             </span>
-            <span className={yearly ? 'text-zinc-900' : 'text-zinc-300'}>{feature}</span>
+            <span className={yearly ? 'text-zinc-900' : 'text-zinc-700 dark:text-zinc-300'}>{feature}</span>
           </div>
         ))}
       </div>
@@ -221,7 +221,7 @@ function PlanCard({
           className={
             yearly
               ? 'relative inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-full bg-zinc-950 px-6 font-bold text-white transition hover:-translate-y-0.5 hover:bg-violet-950 disabled:translate-y-0 disabled:cursor-not-allowed disabled:opacity-55'
-              : 'inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-full bg-white px-6 font-bold text-zinc-950 transition hover:-translate-y-0.5 hover:bg-violet-200 disabled:translate-y-0 disabled:cursor-not-allowed disabled:opacity-55'
+              : 'inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-full bg-zinc-950 px-6 font-bold text-white transition hover:-translate-y-0.5 hover:bg-violet-700 disabled:translate-y-0 disabled:cursor-not-allowed disabled:opacity-55 dark:bg-white dark:text-zinc-950 dark:hover:bg-violet-200'
           }
         >
           {loading ? (

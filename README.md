@@ -22,7 +22,7 @@ The AI combines three inputs: your canvas drawing (vision), your text explanatio
 
 ## Tech Stack
 
-- **Next.js 15** - App Router
+- **Next.js 16** - App Router
 - **Convex** - Real-time database + vector search for RAG
 - **Excalidraw** - Canvas for drawing diagrams
 - **OpenAI** - GPT for dialogue, embeddings for RAG
@@ -78,6 +78,4 @@ Project Structure
 │   ├── actions/             # Scraping, RAG, PDF processing
 │   ├── utils/               # Chunking, similarity, jargon
 │   └── schema.ts            # Database schema
-└── .kiro/specs/             # Kiro spec documents
-Built with Kiro
-This project was built using Kiro's spec-driven development. The .kiro/specs/ folder contains the requirements, design docs, and implementation tasks that guided development.
+└── docs/                    # Plans, ADRs, and progress notes

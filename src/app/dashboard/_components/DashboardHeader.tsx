@@ -4,27 +4,29 @@ import { UserButton } from "@clerk/nextjs";
 import { Brain } from "lucide-react";
 import Link from "next/link";
 import { ManageSubscriptionButton } from "@/app/components/billing";
+import { ThemeToggle } from "@/app/components/ThemeToggle";
 
 export function DashboardHeader() {
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-sm border-b border-gray-200">
+    <header className="fixed left-0 right-0 top-0 z-50 border-b border-zinc-200 bg-white/85 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-950/85">
       <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2 group">
-          <div className="p-1.5 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg shadow-md group-hover:shadow-lg transition-all duration-200">
-            <Brain className="w-5 h-5 text-white" />
+          <div className="rounded-lg bg-violet-600 p-1.5 shadow-md transition-all duration-200 group-hover:bg-violet-700 group-hover:shadow-lg dark:bg-violet-500 dark:group-hover:bg-violet-400">
+            <Brain className="h-5 w-5 text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">AI Protégé</h1>
+          <h1 className="text-2xl font-bold text-zinc-950 dark:text-white">AI Protégé</h1>
         </Link>
         <div className="flex items-center gap-3">
           <ManageSubscriptionButton />
+          <ThemeToggle />
           <UserButton
             appearance={{
               elements: {
                 avatarBox:
-                  "w-9 h-9 ring-2 ring-blue-500/20 hover:ring-blue-500/40 transition-all duration-200",
+                  "h-9 w-9 ring-2 ring-violet-500/25 transition-all duration-200 hover:ring-violet-500/50",
                 userButtonPopoverCard:
-                  "shadow-2xl shadow-gray-400/30 border border-gray-200/50 bg-gray-100",
-                userButtonPopoverActionButton: "hover:bg-gray-200",
+                  "border border-zinc-200 bg-white shadow-2xl shadow-zinc-300/30 dark:border-zinc-800 dark:bg-zinc-900 dark:shadow-black/40",
+                userButtonPopoverActionButton: "hover:bg-zinc-100 dark:hover:bg-zinc-800",
               },
             }}
           />

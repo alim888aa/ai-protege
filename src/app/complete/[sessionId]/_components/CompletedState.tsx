@@ -76,7 +76,7 @@ export function CompletedState({
         {/* Back to Dashboard Button */}
         <button
           onClick={onBackToDashboard}
-          className="px-8 py-4 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+          className="px-8 py-4 bg-violet-600 text-white rounded-xl font-semibold hover:bg-violet-700 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
         >
           Back to Dashboard
         </button>
