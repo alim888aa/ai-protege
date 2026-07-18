@@ -21,3 +21,7 @@ The dashboard and authenticated learning routes were code- and build-verified, b
 ## Next
 
 Visually spot-check the dashboard and teaching route in an authenticated browser session. Keep new primary actions violet and preserve status colors for success, warning, and destructive states.
+
+## July 18 Clerk follow-up
+
+Applied Clerk's complete dark base theme at the shared provider, moved the dashboard avatar styling into that same source, and removed the per-button appearance override that dropped dark popover text colors.

@@ -19,17 +19,7 @@ export function DashboardHeader() {
         <div className="flex items-center gap-3">
           <ManageSubscriptionButton />
           <ThemeToggle />
-          <UserButton
-            appearance={{
-              elements: {
-                avatarBox:
-                  "h-9 w-9 ring-2 ring-violet-500/25 transition-all duration-200 hover:ring-violet-500/50",
-                userButtonPopoverCard:
-                  "border border-zinc-200 bg-white shadow-2xl shadow-zinc-300/30 dark:border-zinc-800 dark:bg-zinc-900 dark:shadow-black/40",
-                userButtonPopoverActionButton: "hover:bg-zinc-100 dark:hover:bg-zinc-800",
-              },
-            }}
-          />
+          <UserButton />
         </div>
       </div>
     </header>

@@ -1,6 +1,7 @@
 "use client";
 
 import { ClerkProvider, useAuth } from "@clerk/nextjs";
+import { dark as clerkDarkTheme } from "@clerk/themes";
 import { ConvexProviderWithClerk } from "convex/react-clerk";
 import { ConvexReactClient } from "convex/react";
 import { ReactNode } from "react";
@@ -12,6 +13,7 @@ function getClerkAppearance(theme: Theme) {
   const dark = theme === "dark";
 
   return {
+    baseTheme: dark ? clerkDarkTheme : undefined,
     variables: {
       colorPrimary: dark ? "#8b5cf6" : "#6d4aff",
       colorTextOnPrimaryBackground: "#ffffff",
@@ -39,10 +41,12 @@ function getClerkAppearance(theme: Theme) {
       identityPreviewEditButton: "text-violet-700 hover:text-violet-800 dark:text-violet-300 dark:hover:text-violet-200",
       userButtonPopoverCard:
         "border border-zinc-200 bg-white shadow-2xl shadow-zinc-300/30 dark:border-zinc-800 dark:bg-zinc-900 dark:shadow-black/40",
-      userButtonPopoverActionButton: "hover:bg-zinc-100 dark:hover:bg-zinc-800",
-      userButtonPopoverActionButtonText: "text-zinc-700 dark:text-zinc-200",
+      userButtonPopoverActionButton:
+        "text-zinc-700 hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-zinc-800",
+      userButtonPopoverActionButtonIcon: "text-zinc-500 dark:text-zinc-400",
       userButtonPopoverFooter: "border-t border-zinc-200 dark:border-zinc-800",
-      avatarBox: "ring-2 ring-violet-500/25",
+      avatarBox:
+        "h-9 w-9 ring-2 ring-violet-500/25 transition-all duration-200 hover:ring-violet-500/50",
     },
   };
 }
